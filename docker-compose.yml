@@ -1,0 +1,45 @@
+services:
+  mysql:
+    image: mysql:8.2
+    container_name: mysql_prod
+    restart: always
+    environment:
+      - MYSQL_DATABASE=app
+      - MYSQL_ROOT_PASSWORD=password
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - mysql_config:/etc/mysql/conf.d
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./custom.cnf:/etc/mysql/conf.d/custom.cnf:ro
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=password"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max_connections=1000
+      - --innodb_buffer_pool_size=2G
+
+volumes:
+  mysql_data:
+    driver: local
+  mysql_config:
+    driver: local
+
+networks:
+  backend:
+    driver: bridge
