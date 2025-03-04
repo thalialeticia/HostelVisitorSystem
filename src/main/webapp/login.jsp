@@ -11,6 +11,7 @@
 <head>
     <title>Login</title>
     <style>
+        /* General Styling */
         body {
             font-family: Arial, sans-serif;
             background-color: #e3f2fd;
@@ -21,6 +22,7 @@
             margin: 0;
         }
 
+        /* Form Container */
         .container {
             background: #ffffff;
             padding: 30px;
@@ -28,13 +30,29 @@
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
             width: 350px;
             text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 1s ease-out forwards;
         }
 
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Headings */
         h2 {
             color: #1565c0;
             margin-bottom: 20px;
         }
 
+        /* Input Fields */
         input {
             width: 100%;
             padding: 10px;
@@ -45,6 +63,7 @@
             font-size: 14px;
         }
 
+        /* Submit Button */
         .submit-btn {
             background-color: #1e88e5;
             color: white;
@@ -55,12 +74,14 @@
             font-size: 16px;
             margin-top: 10px;
             width: 100%;
+            transition: background 0.3s ease;
         }
 
         .submit-btn:hover {
             background-color: #1565c0;
         }
 
+        /* Messages */
         .message {
             font-size: 14px;
             margin-top: 10px;
@@ -76,6 +97,22 @@
         .success {
             background-color: #c8e6c9;
             color: #2e7d32;
+        }
+
+        /* Navigation Links */
+        .nav-links {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .nav-links a {
+            color: #1565c0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #0d47a1;
         }
     </style>
 </head>
@@ -93,11 +130,12 @@
         <p class="message error">${error}</p>
     </c:if>
 
-    <p style="margin-top: 15px; font-size: 14px;">
-        Don't have an account? <a href="resident/register.jsp" style="color: #1565c0;">Register here</a>.
+    <!-- Navigation Links -->
+    <p class="nav-links">
+        Don't have an account? <a href="resident/register.jsp">Register here</a>.<br>
+        <a href="index.jsp">← Back to Home</a>
     </p>
 </div>
 
 </body>
 </html>
-

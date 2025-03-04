@@ -20,21 +20,38 @@ public class UserFacade {
         List<User> users = em.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class)
                 .setParameter("username", username)
                 .getResultList();
-
         return users.isEmpty() ? null : users.get(0);
     }
 
-    public User find(String username) {
-        try {
-            return em.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class)
-                    .setParameter("username", username)
-                    .getSingleResult();
-        } catch (Exception e) {
-            return null;
-        }
+    // ✅ Check if username exists
+    public boolean existsByUsername(String username) {
+        return !em.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class)
+                .setParameter("username", username)
+                .getResultList()
+                .isEmpty();
     }
 
-    public List<User> findAll() {
-        return em.createQuery("SELECT u FROM User u", User.class).getResultList();
+    // ✅ Check if email exists
+    public boolean existsByEmail(String email) {
+        return !em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
+                .setParameter("email", email)
+                .getResultList()
+                .isEmpty();
+    }
+
+    // ✅ Check if phone exists
+    public boolean existsByPhone(String phone) {
+        return !em.createQuery("SELECT u FROM User u WHERE u.phone = :phone", User.class)
+                .setParameter("phone", phone)
+                .getResultList()
+                .isEmpty();
+    }
+
+    // ✅ Check if IC exists
+    public boolean existsByIC(String IC) {
+        return !em.createQuery("SELECT u FROM User u WHERE u.IC = :IC", User.class)
+                .setParameter("IC", IC)
+                .getResultList()
+                .isEmpty();
     }
 }

@@ -14,7 +14,7 @@
         /* General Styling */
         body {
             font-family: Arial, sans-serif;
-            background-color: #e3f2fd; /* Light Blue Background */
+            background-color: #e3f2fd;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -28,7 +28,7 @@
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            width: 350px;
+            width: 400px;
             text-align: center;
             opacity: 0;
             transform: translateY(20px);
@@ -36,20 +36,11 @@
         }
 
         @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
-        h2 {
-            color: #1565c0; /* Dark Blue */
-            margin-bottom: 20px;
-        }
+        h2 { color: #1565c0; margin-bottom: 20px; }
 
         /* Input Fields */
         input, select {
@@ -60,10 +51,6 @@
             border-radius: 6px;
             box-sizing: border-box;
             font-size: 14px;
-        }
-
-        select {
-            background-color: #f8f9fa;
         }
 
         /* Submit Button */
@@ -80,26 +67,27 @@
             transition: background 0.3s ease;
         }
 
-        .submit-btn:hover {
-            background-color: #1565c0;
+        .submit-btn:hover { background-color: #1565c0; }
+
+        /* Error Messages */
+        .error-message {
+            color: red;
+            font-size: 12px;
+            display: none;
+            text-align: left;
+            margin-bottom: 5px;
         }
 
-        /* Messages */
-        .message {
-            font-size: 14px;
-            margin-top: 10px;
-            padding: 8px;
+        /* Error Message Styling */
+        .error-box {
+            background-color: #ffebee;
+            color: #d32f2f;
+            padding: 10px;
             border-radius: 6px;
-        }
-
-        .error {
-            background-color: #ffcdd2;
-            color: #c62828;
-        }
-
-        .success {
-            background-color: #c8e6c9;
-            color: #2e7d32;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 15px;
+            display: block;
         }
 
         /* Navigation Links */
@@ -114,38 +102,58 @@
             transition: color 0.3s ease;
         }
 
-        .nav-links a:hover {
-            color: #0d47a1;
-        }
+        .nav-links a:hover { color: #0d47a1; }
     </style>
 </head>
 <body>
 
 <div class="container">
+
+    <!-- ✅ Display Error Message -->
+    <c:if test="${not empty error}">
+        <div class="error-box">
+            <p>${error}</p>
+        </div>
+    </c:if>
+
     <h2>Resident Registration</h2>
-    <form action="${pageContext.request.contextPath}/RegisterServlet" method="post">
+
+    <form action="${pageContext.request.contextPath}/RegisterServlet" method="post" onsubmit="return validateForm()">
         <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
+
+        <!-- Password Field with Validation -->
+        <input type="password" id="password" name="password" placeholder="Password" required onkeyup="validatePassword()">
+        <p class="error-message" id="passwordError">Password must be at least 5 characters long and contain at least 1 number.</p>
+
         <input type="text" name="name" placeholder="Full Name" required>
 
+        <!-- Gender Selection -->
         <select name="gender">
             <option value="MALE">Male</option>
             <option value="FEMALE">Female</option>
         </select>
 
-        <input type="text" name="phone" placeholder="Phone Number" required>
-        <input type="text" name="IC" placeholder="IC Number" required>
+        <!-- Phone Number with Country Code -->
+        <div style="display: flex; gap: 5px;">
+            <select id="countryCode">
+                <option value="+60">🇲🇾 +60 (Malaysia)</option>
+                <option value="+65">🇸🇬 +65 (Singapore)</option>
+                <option value="+1">🇺🇸 +1 (USA)</option>
+                <option value="+44">🇬🇧 +44 (UK)</option>
+                <option value="+91">🇮🇳 +91 (India)</option>
+            </select>
+            <input type="text" id="phone" name="phone" placeholder="Phone Number" required onkeyup="validatePhone()">
+        </div>
+        <p class="error-message" id="phoneError">Enter a valid phone number.</p>
+
+        <!-- Malaysian IC Number Validation -->
+        <input type="text" id="ic" name="IC" placeholder="Malaysian IC Number" required onkeyup="validateIC()">
+        <p class="error-message" id="icError">IC number must be exactly 12 digits (e.g. 010203041234).</p>
+
         <input type="email" name="email" placeholder="Email" required>
 
         <button type="submit" class="submit-btn">Register</button>
     </form>
-
-    <c:if test="${not empty error}">
-        <p class="message error">${error}</p>
-    </c:if>
-    <c:if test="${not empty success}">
-        <p class="message success">${success}</p>
-    </c:if>
 
     <!-- Navigation Links -->
     <p class="nav-links">
@@ -154,6 +162,53 @@
     </p>
 </div>
 
+<script>
+    function validatePassword() {
+        let password = document.getElementById("password").value;
+        let passwordError = document.getElementById("passwordError");
+        let regex = /^(?=.*\d).{5,}$/; // Must contain at least 1 number and be 5+ characters
+
+        if (!regex.test(password)) {
+            passwordError.style.display = "block";
+            return false;
+        } else {
+            passwordError.style.display = "none";
+            return true;
+        }
+    }
+
+    function validatePhone() {
+        let phone = document.getElementById("phone").value;
+        let phoneError = document.getElementById("phoneError");
+        let regex = /^[0-9]{7,12}$/; // Phone number must be 7 to 12 digits long
+
+        if (!regex.test(phone)) {
+            phoneError.style.display = "block";
+            return false;
+        } else {
+            phoneError.style.display = "none";
+            return true;
+        }
+    }
+
+    function validateIC() {
+        let ic = document.getElementById("ic").value;
+        let icError = document.getElementById("icError");
+        let regex = /^[0-9]{12}$/; // Must be exactly 12 digits
+
+        if (!regex.test(ic)) {
+            icError.style.display = "block";
+            return false;
+        } else {
+            icError.style.display = "none";
+            return true;
+        }
+    }
+
+    function validateForm() {
+        return validatePassword() && validatePhone() && validateIC();
+    }
+</script>
+
 </body>
 </html>
-
