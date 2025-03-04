@@ -78,6 +78,15 @@
             position: relative;
         }
 
+        /* ✔ Checkmark Style */
+        .animated-list li::before {
+            content: "✔ ";
+            color: #1e88e5;
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
         /* Footer */
         .footer {
             margin-top: 30px;
