@@ -27,11 +27,9 @@ public class LoginServlet extends HttpServlet {
         User user = userFacade.findByUsername(username);
 
         if (user != null && user.checkPassword(password)) {
-            // ✅ Create session and store user object
             HttpSession session = request.getSession(true);
             session.setAttribute("loggedUser", user);
 
-            // ✅ Redirect based on user role
             switch (user.getRole()) {
                 case MANAGING_STAFF:
                     response.sendRedirect("admin/dashboardAdmin.jsp");

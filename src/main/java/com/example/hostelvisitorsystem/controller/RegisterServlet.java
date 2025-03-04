@@ -30,7 +30,6 @@ public class RegisterServlet extends HttpServlet {
         String IC = request.getParameter("IC");
         String email = request.getParameter("email");
 
-        // ✅ Check if username, email, phone, or IC already exists
         if (userFacade.existsByUsername(username)) {
             request.setAttribute("error", "Username already taken.");
             request.getRequestDispatcher("resident/register.jsp").forward(request, response);
@@ -55,7 +54,6 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        // ✅ Create resident object
         Resident newResident = new Resident();
         newResident.setUsername(username);
         newResident.setPassword(password);
@@ -66,10 +64,8 @@ public class RegisterServlet extends HttpServlet {
         newResident.setEmail(email);
         newResident.setRole(User.Role.RESIDENT);
 
-        // ✅ Save to database
         userFacade.create(newResident);
 
-        // ✅ Redirect to login page upon success
         response.sendRedirect(request.getContextPath() + "/login.jsp");
     }
 }

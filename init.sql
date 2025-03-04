@@ -59,7 +59,7 @@ CREATE TABLE visit_requests (
 -- Insert Managing Staff (Admin)
 INSERT INTO users (id, username, password, name, gender, phone, IC, email, role)
 VALUES
-    (UUID(), 'admin', '$2a$12$DlP7e.4JdH3ikBGUqivRweq5LgGJbPpj2Xq6lo0lhnvF/ewuOVPG6', 'Admin User', 'MALE', '0123456789', 'M1234567890', 'admin@example.com', 'MANAGING_STAFF');
+    (UUID(), 'admin', '$2a$12$DlP7e.4JdH3ikBGUqivRweq5LgGJbPpj2Xq6lo0lhnvF/ewuOVPG6', 'Admin User', 'MALE', '0123456789', '123456789012', 'admin@example.com', 'MANAGING_STAFF');
 
 INSERT INTO managing_staff (id, department)
 VALUES ((SELECT id FROM users WHERE username='admin'), 'Human Resources');
@@ -67,8 +67,8 @@ VALUES ((SELECT id FROM users WHERE username='admin'), 'Human Resources');
 -- Insert Residents
 INSERT INTO users (id, username, password, name, gender, phone, IC, email, role)
 VALUES
-    (UUID(), 'resident1', '$2a$12$s5xdIpoAjJv6jdNEAEDZhec0xFHGKhuCKgJBOuFBfaYnoRzdxNog6', 'Resident One', 'FEMALE', '0123456788', 'R1234567890', 'resident1@example.com', 'RESIDENT'),
-    (UUID(), 'resident2', '$2a$12$rQ11IonzC4Hye3/oa11ove0X6aD/yU/rbTP9KBx335LKVvviXnA6K', 'Resident Two', 'MALE', '0123456787', 'R0987654321', 'resident2@example.com', 'RESIDENT');
+    (UUID(), 'resident1', '$2a$12$s5xdIpoAjJv6jdNEAEDZhec0xFHGKhuCKgJBOuFBfaYnoRzdxNog6', 'Resident One', 'FEMALE', '0123456788', '234567890123', 'resident1@example.com', 'RESIDENT'),
+    (UUID(), 'resident2', '$2a$12$rQ11IonzC4Hye3/oa11ove0X6aD/yU/rbTP9KBx335LKVvviXnA6K', 'Resident Two', 'MALE', '0123456787', '345678901234', 'resident2@example.com', 'RESIDENT');
 
 INSERT INTO residents (id)
 VALUES
@@ -78,7 +78,7 @@ VALUES
 -- Insert Security Staff
 INSERT INTO users (id, username, password, name, gender, phone, IC, email, role)
 VALUES
-    (UUID(), 'security1', '$2a$12$OT6g.gDBwVclQSp8K1oj8OxYnc1dnvwRBRG8/tFpp9Px9qC85VO/2', 'Security One', 'MALE', '0123456786', 'S1234567890', 'security1@example.com', 'SECURITY_STAFF');
+    (UUID(), 'security1', '$2a$12$OT6g.gDBwVclQSp8K1oj8OxYnc1dnvwRBRG8/tFpp9Px9qC85VO/2', 'Security One', 'MALE', '0123456786', '456789012345', 'security1@example.com', 'SECURITY_STAFF');
 
 INSERT INTO security_staff (id, shift)
 VALUES ((SELECT id FROM users WHERE username='security1'), 'NIGHT');

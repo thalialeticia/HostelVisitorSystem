@@ -14,7 +14,7 @@
     User loggedUser = (sessionObj != null) ? (User) sessionObj.getAttribute("loggedUser") : null;
 
     if (loggedUser == null || !loggedUser.getRole().toString().equals("MANAGING_STAFF")) {
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("../login.jsp");
         return;
     }
 %>
@@ -23,12 +23,59 @@
 <head>
     <title>Admin Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #e3f2fd; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); text-align: center; width: 400px; }
-        h2 { color: #1565c0; }
-        .button { display: block; background-color: #1e88e5; color: white; padding: 10px; border-radius: 6px; margin: 5px 0; text-decoration: none; }
-        .button:hover { background-color: #1565c0; }
-        .logout-btn { background-color: #e53935; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to right, #e3f2fd, #bbdefb);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 400px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #0d47a1;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .button {
+            display: block;
+            background-color: #1e88e5;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .button:hover {
+            background-color: #1565c0;
+            transform: scale(1.05);
+        }
+
+        .logout-btn {
+            background-color: #e53935;
+        }
     </style>
 </head>
 <body>
@@ -39,9 +86,9 @@
     <a href="manageUsers.jsp" class="button">Manage Users</a>
     <a href="viewReports.jsp" class="button">View Reports</a>
     <a href="approveVisitors.jsp" class="button">Approve Visitor Requests</a>
+    <a href="../editProfile.jsp" class="button">Edit Profile</a>
 
     <a href="${pageContext.request.contextPath}/LogoutServlet" class="button logout-btn">Logout</a>
-
 </div>
 </body>
 </html>

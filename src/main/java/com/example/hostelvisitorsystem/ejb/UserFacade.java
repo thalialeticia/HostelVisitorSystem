@@ -15,6 +15,18 @@ public class UserFacade {
     public void create(User user) {
         em.persist(user);
     }
+    public void updateUser(User user) {
+        em.merge(user);
+    }
+
+    public boolean isFieldUnique(String field, String value, String userId) {
+        String queryStr = "SELECT COUNT(u) FROM User u WHERE u." + field + " = :value AND u.id <> :userId";
+        Long count = em.createQuery(queryStr, Long.class)
+                .setParameter("value", value)
+                .setParameter("userId", userId)
+                .getSingleResult();
+        return count == 0; // Returns true if no duplicate exists
+    }
 
     public User findByUsername(String username) {
         List<User> users = em.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class)
