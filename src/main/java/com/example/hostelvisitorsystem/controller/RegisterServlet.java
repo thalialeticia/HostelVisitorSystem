@@ -30,13 +30,10 @@ public class RegisterServlet extends HttpServlet {
         String IC = request.getParameter("IC");
         String email = request.getParameter("email");
 
-        // Hash password
-        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt(12));
-
         // Create resident object
         Resident newResident = new Resident();
         newResident.setUsername(username);
-        newResident.setPassword(hashedPassword);
+        newResident.setPassword(password);
         newResident.setName(name);
         newResident.setGender(gender);
         newResident.setPhone(phone);
@@ -47,7 +44,6 @@ public class RegisterServlet extends HttpServlet {
         // Save to database
         userFacade.create(newResident);
 
-        request.setAttribute("success", "Registration successful!");
-        request.getRequestDispatcher("resident/register.jsp").forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
     }
 }
