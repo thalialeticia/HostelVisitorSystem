@@ -44,6 +44,14 @@ public class UserFacade {
         return staffList;
     }
 
+    public List<User> getAllResident() {
+        List<User> residentList = em.createQuery("SELECT u FROM User u WHERE u.role IN (:role1)", User.class)
+                .setParameter("role1", User.Role.RESIDENT)
+                .getResultList();
+
+        return residentList;
+    }
+
     public boolean isFieldUnique(String field, String value, String userId) {
         String queryStr = "SELECT COUNT(u) FROM User u WHERE u." + field + " = :value AND u.id <> :userId";
         Long count = em.createQuery(queryStr, Long.class)

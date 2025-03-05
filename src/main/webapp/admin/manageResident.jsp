@@ -143,44 +143,100 @@
 <body>
 
 <div class="container">
+    <!-- Success Message (Hidden by Default) -->
+    <c:if test="${not empty success}">
+        <div class="success-box">
+            <p>${success}</p>
+        </div>
+        <c:remove var="success" scope="session"/>
+    </c:if>
+
+    <!-- Error Message (Hidden by Default) -->
+    <c:if test="${not empty error}">
+        <div class="error-box">
+            <p>${error}</p>
+        </div>
+        <c:remove var="error" scope="session"/>
+    </c:if>
+
     <h2>Manage Resident Accounts</h2>
 
-    <input type="text" id="searchInput" placeholder="Search residents..." onkeyup="searchResidents()">
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search by Name or Email..." onkeyup="searchResident()">
+    </div>
 
+    <!-- Resident Table -->
     <table>
+        <thead>
         <tr>
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
             <th>Actions</th>
         </tr>
-<%--        <% for (User resident : residentList) { %>--%>
-<%--        <tr>--%>
-<%--            <td><%= resident.getName() %></td>--%>
-<%--            <td><%= resident.getEmail() %></td>--%>
-<%--            <td><%= resident.getPhone() %></td>--%>
-<%--            <td>--%>
-<%--                <a href="editResident.jsp?id=<%= resident.getId() %>" class="button">Edit</a>--%>
-<%--                <a href="deleteResidentServlet?id=<%= resident.getId() %>" class="button delete-btn">Delete</a>--%>
-<%--            </td>--%>
-<%--        </tr>--%>
-<%--        <% } %>--%>
+        <tbody id="residentTable">
+            <% if (residentList != null && !residentList.isEmpty()) {
+            for (User resident : residentList) { %>
+        <tr>
+            <td><%= resident.getName() %></td>
+            <td><%= resident.getEmail() %></td>
+            <td><%= resident.getPhone() %></td>
+            <td>
+                <button class="action-btn edit-btn" onclick="editResident('<%= resident.getId() %>')">Edit</button>
+                <button class="action-btn delete-btn" onclick="deleteResident('<%= resident.getId() %>')">Delete</button>
+            </td>
+        </tr>
+        <% }
+        } else { %>
+        <tr>
+            <td colspan="4">No staff found.</td>
+        </tr>
+        <% } %>
+        </tbody>
     </table>
+</div>
 
-    <a href="addResident.jsp" class="button">Add New Resident</a>
+<!-- Buttons Below Container -->
+<div class="button-container">
+    <a href="${pageContext.request.contextPath}/admin/dashboard" class="button back-btn">Back to Dashboard</a>
 </div>
 
 <script>
-    function searchResidents() {
+    function searchResident() {
         let input = document.getElementById("searchInput").value.toLowerCase();
-        let rows = document.querySelectorAll("table tr:not(:first-child)");
+        let rows = document.querySelectorAll("#residentTable tr");
 
         rows.forEach(row => {
-            let name = row.cells[0].innerText.toLowerCase();
-            let email = row.cells[1].innerText.toLowerCase();
+            let name = row.cells[0].textContent.toLowerCase();
+            let email = row.cells[1].textContent.toLowerCase();
             row.style.display = (name.includes(input) || email.includes(input)) ? "" : "none";
         });
     }
+
+    function editResident(id) {
+        window.location.href = "${pageContext.request.contextPath}/admin/editResident?id=" + id;
+    }
+
+    function deleteResident(id) {
+        if (confirm("Are you sure you want to delete this staff member?")) {
+            window.location.href = "${pageContext.request.contextPath}/admin/deleteResident?id=" + id;
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        let successBox = document.querySelector(".success-box");
+        let errorBox = document.querySelector(".error-box");
+
+        // ✅ Show only if content exists
+        if (successBox && successBox.textContent.trim() !== "") {
+            successBox.style.display = "block";
+        }
+
+        if (errorBox && errorBox.textContent.trim() !== "") {
+            errorBox.style.display = "block";
+        }
+    });
 </script>
 
 </body>

@@ -159,7 +159,7 @@
         <c:remove var="error" scope="session"/>
     </c:if>
 
-    <h2>Manage Staff</h2>
+    <h2>Manage Staff Accounts</h2>
 
     <!-- Search Bar -->
     <div class="search-container">

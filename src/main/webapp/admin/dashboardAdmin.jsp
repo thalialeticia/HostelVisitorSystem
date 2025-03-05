@@ -180,8 +180,8 @@
     <a href="${pageContext.request.contextPath}/admin/manageStaff" class="button">
         <i class="fas fa-user-cog"></i> Manage Staff
     </a>
-    <a href="manageResident.jsp" class="button">
-        <i class="fas fa-user"></i> Manage Residents
+    <a href="${pageContext.request.contextPath}/admin/manageResident" class="button">
+        <i class="fas fa-user-cog"></i> Manage Resident
     </a>
     <a href="viewReports.jsp" class="button">
         <i class="fas fa-chart-line"></i> View Reports
