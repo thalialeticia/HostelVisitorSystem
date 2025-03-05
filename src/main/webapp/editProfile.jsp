@@ -17,13 +17,35 @@
         response.sendRedirect("login.jsp");
         return;
     }
+
+    // Extract Country Code and Phone Number
+    String fullPhone = loggedUser.getPhone();
+    String countryCode = "+60"; // Default country code
+    String phoneNumber = fullPhone;
+
+    if (fullPhone.startsWith("+65")) {
+        countryCode = "+65";
+        phoneNumber = fullPhone.substring(3);
+    } else if (fullPhone.startsWith("+1")) {
+        countryCode = "+1";
+        phoneNumber = fullPhone.substring(2);
+    } else if (fullPhone.startsWith("+44")) {
+        countryCode = "+44";
+        phoneNumber = fullPhone.substring(3);
+    } else if (fullPhone.startsWith("+91")) {
+        countryCode = "+91";
+        phoneNumber = fullPhone.substring(3);
+    } else {
+        if (fullPhone.startsWith("+60")) {
+            phoneNumber = fullPhone.substring(3);
+        }
+    }
 %>
 
 <html>
 <head>
     <title>Edit Profile</title>
     <style>
-        /* General Styling */
         body {
             font-family: Arial, sans-serif;
             background-color: #e3f2fd;
@@ -34,7 +56,6 @@
             margin: 0;
         }
 
-        /* Form Container */
         .container {
             background: #ffffff;
             padding: 30px;
@@ -54,7 +75,6 @@
 
         h2 { color: #1565c0; margin-bottom: 20px; }
 
-        /* Input Fields */
         input, select {
             width: 100%;
             padding: 10px;
@@ -65,13 +85,11 @@
             font-size: 14px;
         }
 
-        /* Greyed out input field */
         input[readonly] {
             background-color: #e0e0e0;
             cursor: not-allowed;
         }
 
-        /* Submit & Back Button */
         .button {
             background-color: #1e88e5;
             color: white;
@@ -97,93 +115,53 @@
             background-color: #616161;
         }
 
-        /* Error Messages (Initially Hidden) */
-        .error-message {
-            color: red;
-            font-size: 12px;
-            display: none;
-            text-align: left;
-            margin-bottom: 5px;
-        }
-
-        /* Error Box */
-        .error-box {
-            background-color: #ffebee;
-            color: #d32f2f;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 14px;
-            text-align: center;
-            margin-bottom: 15px;
-            display: none;
-        }
-
-        /* Country Code & Phone Input Layout */
         .phone-container {
             display: flex;
             gap: 5px;
         }
+
         .phone-container select {
             width: 30%;
         }
+
         .phone-container input {
             width: 70%;
         }
 
+        .error-message {
+            color: red;
+            font-size: 12px;
+            display: none; /* Hide error messages initially */
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-
-    <c:if test="${not empty success}">
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                alert("${success}"); // ✅ Show success popup
-                <c:remove var="success" scope="session" /> // ✅ Clear success message
-            });
-        </script>
-    </c:if>
-
-    <!-- Hide error box if no error -->
-    <c:if test="${empty error}">
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                let errorBox = document.querySelector(".error-box");
-                if (errorBox) errorBox.style.display = "none";
-            });
-        </script>
-    </c:if>
-
-
     <h2>Edit Profile</h2>
 
     <form action="${pageContext.request.contextPath}/EditProfileServlet" method="post" onsubmit="return validateForm()">
-        <!-- Username (Greyed out & uneditable) -->
         <input type="text" name="username" value="<%= loggedUser.getUsername() %>" readonly>
 
-        <!-- Password Field (Optional) -->
         <input type="password" id="password" name="password" placeholder="New Password (Leave blank to keep current)" onkeyup="validatePassword()">
         <p class="error-message" id="passwordError">Password must be at least 5 characters long and contain at least 1 number.</p>
 
         <input type="text" name="name" placeholder="Full Name" value="<%= loggedUser.getName() %>" required>
 
-        <!-- Gender Selection -->
         <select name="gender">
             <option value="MALE" <%= loggedUser.getGender().equals("MALE") ? "selected" : "" %>>Male</option>
             <option value="FEMALE" <%= loggedUser.getGender().equals("FEMALE") ? "selected" : "" %>>Female</option>
         </select>
 
-        <!-- Phone Number with Country Code -->
         <div class="phone-container">
-            <select id="countryCode">
-                <option value="+60">🇲🇾 +60</option>
-                <option value="+65">🇸🇬 +65</option>
-                <option value="+1">🇺🇸 +1</option>
-                <option value="+44">🇬🇧 +44</option>
-                <option value="+91">🇮🇳 +91</option>
+            <select id="countryCode" name="countryCode">
+                <option value="+60" <%= countryCode.equals("+60") ? "selected" : "" %>>🇲🇾 +60</option>
+                <option value="+65" <%= countryCode.equals("+65") ? "selected" : "" %>>🇸🇬 +65</option>
+                <option value="+1" <%= countryCode.equals("+1") ? "selected" : "" %>>🇺🇸 +1</option>
+                <option value="+44" <%= countryCode.equals("+44") ? "selected" : "" %>>🇬🇧 +44</option>
+                <option value="+91" <%= countryCode.equals("+91") ? "selected" : "" %>>🇮🇳 +91</option>
             </select>
-            <input type="text" id="phone" name="phone" placeholder="Phone Number" value="<%= loggedUser.getPhone() %>" required onkeyup="validatePhone()">
+            <input type="text" id="phone" name="phone" placeholder="Phone Number" value="<%= phoneNumber %>" required onkeyup="validatePhone()">
         </div>
         <p class="error-message" id="phoneError">Enter a valid phone number.</p>
 
@@ -195,28 +173,7 @@
         <button type="submit" class="button">Update Profile</button>
     </form>
 
-    <%
-        String dashboardUrl = "login.jsp?error=UnknownRole"; // Default fallback
-
-        if (loggedUser != null) {
-            switch (loggedUser.getRole().name()) {
-                case "MANAGING_STAFF":
-                    dashboardUrl = "admin/dashboardAdmin.jsp";
-                    break;
-                case "RESIDENT":
-                    dashboardUrl = "resident/dashboardResident.jsp";
-                    break;
-                case "SECURITY_STAFF":
-                    dashboardUrl = "security/dashboardSecurity.jsp";
-                    break;
-            }
-        }
-    %>
-
-    <a href="<%= dashboardUrl %>" class="button back-btn">Back to Dashboard</a>
-
-
-
+    <a href="${pageContext.request.contextPath}/admin/dashboard" class="button back-btn">Back to Dashboard</a>
 </div>
 
 <script>
@@ -269,4 +226,3 @@
 
 </body>
 </html>
-

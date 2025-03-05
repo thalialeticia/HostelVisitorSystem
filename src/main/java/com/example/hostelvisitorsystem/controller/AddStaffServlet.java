@@ -24,7 +24,7 @@ public class AddStaffServlet extends HttpServlet {
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
-        String password = BCrypt.hashpw(request.getParameter("password"), BCrypt.gensalt(12));
+        String password =request.getParameter("password");
 
 //        User newStaff = new User(UUID.randomUUID().toString(), "SECURITY_STAFF", name, phone, email, password);
 //        userFacade.create(newStaff);

@@ -65,7 +65,7 @@ public class EditProfileServlet extends HttpServlet {
 
         // If password is provided, hash and update it
         if (password != null && !password.isEmpty()) {
-            loggedUser.setPassword(BCrypt.hashpw(password, BCrypt.gensalt(12)));
+            loggedUser.setPassword(password);
         }
 
         userFacade.update(loggedUser);
@@ -75,7 +75,7 @@ public class EditProfileServlet extends HttpServlet {
 
         switch (loggedUser.getRole()) {
             case MANAGING_STAFF:
-                response.sendRedirect("admin/dashboardAdmin.jsp");
+                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
                 break;
             case RESIDENT:
                 response.sendRedirect("resident/dashboardResident.jsp");

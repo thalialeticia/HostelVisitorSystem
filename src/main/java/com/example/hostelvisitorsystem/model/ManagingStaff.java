@@ -11,6 +11,9 @@ public class ManagingStaff extends User {
     @Column(nullable = false)
     private String department;
 
+    @Column(nullable = false)
+    private boolean isSuperAdmin = false; // Default false
+
     public ManagingStaff() {
         this.setRole(Role.MANAGING_STAFF);
         this.department = "General Administration"; // Default department
@@ -22,5 +25,13 @@ public class ManagingStaff extends User {
 
     public void setDepartment(String department) {
         this.department = department;
+    }
+
+    public boolean isSuperAdmin() { // ✅ Add this method
+        return isSuperAdmin;
+    }
+
+    public void setSuperAdmin(boolean superAdmin) {
+        isSuperAdmin = superAdmin;
     }
 }

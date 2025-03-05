@@ -23,8 +23,8 @@
 <head>
     <title>Resident Dashboard</title>
 
-    <!-- Ensure Font Awesome is Loaded -->
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
     <style>
         body {
@@ -43,7 +43,7 @@
             border-radius: 15px;
             box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
             text-align: center;
-            width: 400px;
+            width: 450px;
             opacity: 0;
             transform: translateY(20px);
             animation: fadeIn 1s ease-out forwards;
@@ -59,21 +59,16 @@
             color: #0d47a1;
             font-size: 24px;
             margin-bottom: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
         }
 
         .edit-profile {
-            font-size: 18px;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 20px;
             color: #1e88e5;
             text-decoration: none;
-            transition: transform 0.2s ease, color 0.3s ease;
-        }
-
-        .edit-profile i {
-            vertical-align: middle;
+            transition: color 0.3s ease, transform 0.2s ease;
         }
 
         .edit-profile:hover {
@@ -81,22 +76,29 @@
             transform: scale(1.1);
         }
 
-        /* Alternative: If Font Awesome Fails, Show Unicode ✎ */
-        .edit-profile::after {
-            content: " ✎";  /* Unicode Pen Icon */
-            font-size: 16px;
+        .dashboard-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
         }
 
         .button {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background-color: #1e88e5;
             color: white;
             padding: 12px;
             border-radius: 8px;
-            margin: 10px 0;
             text-decoration: none;
             font-size: 16px;
             transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .button i {
+            margin-right: 8px;
+            font-size: 18px;
         }
 
         .button:hover {
@@ -111,17 +113,18 @@
 </head>
 <body>
 <div class="container">
-    <h2>
-        <a href="../editProfile.jsp" class="edit-profile" title="Edit Profile">
-            <i class="fas fa-edit"></i>  <!-- Font Awesome Edit Icon -->
-        </a>
-        Welcome, <%= loggedUser.getUsername() %>
-    </h2>
+    <a href="../editProfile.jsp" class="edit-profile" title="Edit Profile">
+        <i class="fa-solid fa-user-pen"></i>
+    </a>
+
+    <h2>Welcome, <%= loggedUser.getUsername() %>!</h2>
     <p>Role: <strong>Resident</strong></p>
 
-    <a href="requestVisit.jsp" class="button">Request a Visit</a>
-    <a href="viewHistory.jsp" class="button">View Visit History</a>
-    <a href="${pageContext.request.contextPath}/LogoutServlet" class="button logout-btn">Logout</a>
+    <div class="dashboard-options">
+        <a href="requestVisit.jsp" class="button"><i class="fa-solid fa-calendar-check"></i> Request a Visit</a>
+        <a href="viewHistory.jsp" class="button"><i class="fa-solid fa-clock-rotate-left"></i> View Visit History</a>
+        <a href="${pageContext.request.contextPath}/LogoutServlet" class="button logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </div>
 </div>
 </body>
 </html>

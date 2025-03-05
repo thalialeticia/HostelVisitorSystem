@@ -6,7 +6,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Stateless
 public class UserFacade {
@@ -29,9 +31,10 @@ public class UserFacade {
     public void delete(String id) {
         User user = find(id);
         if (user != null) {
-            em.remove(user);
+            em.remove(em.contains(user) ? user : em.merge(user));
         }
     }
+
     public List<User> getAllStaff() {
         List<User> staffList = em.createQuery("SELECT u FROM User u WHERE u.role IN (:role1, :role2)", User.class)
                 .setParameter("role1", User.Role.SECURITY_STAFF)
@@ -88,4 +91,29 @@ public class UserFacade {
                 .getResultList()
                 .isEmpty();
     }
+
+    public Map<String, Long> countAnalytics() {
+        Map<String, Long> counts = new HashMap<>();
+
+        // Counting staff (Managing Staff + Security Staff)
+        Long staffCount = em.createQuery("SELECT COUNT(u) FROM User u WHERE u.role IN (:role1, :role2)", Long.class)
+                .setParameter("role1", User.Role.SECURITY_STAFF)
+                .setParameter("role2", User.Role.MANAGING_STAFF)
+                .getSingleResult();
+        counts.put("staff", staffCount);
+
+        // Counting residents
+        Long residentCount = em.createQuery("SELECT COUNT(u) FROM User u WHERE u.role = :role", Long.class)
+                .setParameter("role", User.Role.RESIDENT)
+                .getSingleResult();
+        counts.put("residents", residentCount);
+
+        // Counting visitors
+        Long visitorCount = em.createQuery("SELECT COUNT(v) FROM Visitor v", Long.class)
+                .getSingleResult();
+        counts.put("visitors", visitorCount);
+
+        return counts;
+    }
+
 }

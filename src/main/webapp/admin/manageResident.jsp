@@ -7,22 +7,14 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.example.hostelvisitorsystem.model.User" %>
-<%@ page import="com.example.hostelvisitorsystem.ejb.UserFacade" %>
-<%@ page import="jakarta.inject.Inject" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 
 <%
-    HttpSession sessionObj = request.getSession(false);
-    User loggedUser = (sessionObj != null) ? (User) sessionObj.getAttribute("loggedUser") : null;
-
-    if (loggedUser == null || !loggedUser.getRole().toString().equals("MANAGING_STAFF")) {
-        response.sendRedirect("../login.jsp");
-        return;
+    List<User> residentList = (List<User>) request.getAttribute("residentList");
+    if (residentList == null) {
+        residentList = new ArrayList<>();
     }
-
-//    @Inject
-//    UserFacade userFacade;
-//    List<User> residentList = userFacade.getAllResidents();
 %>
 
 <html>
@@ -33,32 +25,45 @@
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(to right, #e3f2fd, #bbdefb);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            height: 100vh;
             margin: 0;
-            padding: 20px;
         }
 
         .container {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 30px;
+            border-radius: 15px;
             box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
-            width: 90%;
-            max-width: 800px;
+            text-align: center;
+            width: 800px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         h2 {
             color: #0d47a1;
-            text-align: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .search-container {
+            margin-bottom: 15px;
         }
 
         input[type="text"] {
-            width: 100%;
             padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
+            width: 80%;
+            border: 1px solid #90caf9;
+            border-radius: 6px;
         }
 
         table {
@@ -67,28 +72,72 @@
             margin-top: 10px;
         }
 
-        table, th, td {
-            border: 1px solid #ddd;
+        th, td {
+            border: 1px solid #90caf9;
+            padding: 10px;
+            text-align: center;
         }
 
-        th, td {
-            padding: 10px;
-            text-align: left;
+        th {
+            background-color: #1e88e5;
+            color: white;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .edit-btn { background-color: #fbc02d; }
+        .delete-btn { background-color: #e53935; }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            width: 100%;
+            text-align: center;
         }
 
         .button {
             display: inline-block;
-            padding: 8px 12px;
-            margin: 5px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            background-color: #1e88e5;
             color: white;
             text-decoration: none;
-            border-radius: 5px;
-            background-color: #1e88e5;
+            font-size: 16px;
+            transition: background 0.3s ease, transform 0.2s ease;
         }
 
-        .delete-btn {
-            background-color: #e53935;
+        .button:hover {
+            background-color: #1565c0;
+            transform: scale(1.05);
         }
+
+        .success-box, .error-box {
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: none; /* ✅ Initially hidden */
+        }
+
+        .success-box {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .error-box {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
     </style>
 </head>
 <body>

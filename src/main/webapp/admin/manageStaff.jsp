@@ -19,7 +19,7 @@
 
 <html>
 <head>
-    <title>Manage Staff</title>
+    <title>Manage Staff Accounts</title>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -119,12 +119,46 @@
             transform: scale(1.05);
         }
 
+        .success-box, .error-box {
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: none; /* ✅ Initially hidden */
+        }
+
+        .success-box {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .error-box {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
     </style>
 </head>
 <body>
 
-<!-- Staff Management Container -->
 <div class="container">
+    <!-- Success Message (Hidden by Default) -->
+    <c:if test="${not empty success}">
+        <div class="success-box">
+            <p>${success}</p>
+        </div>
+        <c:remove var="success" scope="session"/>
+    </c:if>
+
+    <!-- Error Message (Hidden by Default) -->
+    <c:if test="${not empty error}">
+        <div class="error-box">
+            <p>${error}</p>
+        </div>
+        <c:remove var="error" scope="session"/>
+    </c:if>
+
     <h2>Manage Staff</h2>
 
     <!-- Search Bar -->
@@ -167,7 +201,7 @@
 <!-- Buttons Below Container -->
 <div class="button-container">
     <a href="addStaff.jsp" class="button">Add New Staff</a>
-    <a href="dashboardAdmin.jsp" class="button">Back to Dashboard</a>
+    <a href="${pageContext.request.contextPath}/admin/dashboard" class="button back-btn">Back to Dashboard</a>
 </div>
 
 <script>
@@ -183,14 +217,28 @@
     }
 
     function editStaff(id) {
-        window.location.href = "editStaff.jsp?id=" + id;
+        window.location.href = "${pageContext.request.contextPath}/admin/editStaff?id=" + id;
     }
 
     function deleteStaff(id) {
         if (confirm("Are you sure you want to delete this staff member?")) {
-            window.location.href = "DeleteStaffServlet?id=" + id;
+            window.location.href = "${pageContext.request.contextPath}/admin/deleteStaff?id=" + id;
         }
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        let successBox = document.querySelector(".success-box");
+        let errorBox = document.querySelector(".error-box");
+
+        // ✅ Show only if content exists
+        if (successBox && successBox.textContent.trim() !== "") {
+            successBox.style.display = "block";
+        }
+
+        if (errorBox && errorBox.textContent.trim() !== "") {
+            errorBox.style.display = "block";
+        }
+    });
 </script>
 
 </body>
