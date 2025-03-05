@@ -22,6 +22,10 @@
 <html>
 <head>
     <title>Resident Dashboard</title>
+
+    <!-- Ensure Font Awesome is Loaded -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -43,6 +47,7 @@
             opacity: 0;
             transform: translateY(20px);
             animation: fadeIn 1s ease-out forwards;
+            position: relative;
         }
 
         @keyframes fadeIn {
@@ -54,6 +59,32 @@
             color: #0d47a1;
             font-size: 24px;
             margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .edit-profile {
+            font-size: 18px;
+            color: #1e88e5;
+            text-decoration: none;
+            transition: transform 0.2s ease, color 0.3s ease;
+        }
+
+        .edit-profile i {
+            vertical-align: middle;
+        }
+
+        .edit-profile:hover {
+            color: #1565c0;
+            transform: scale(1.1);
+        }
+
+        /* Alternative: If Font Awesome Fails, Show Unicode ✎ */
+        .edit-profile::after {
+            content: " ✎";  /* Unicode Pen Icon */
+            font-size: 16px;
         }
 
         .button {
@@ -80,16 +111,17 @@
 </head>
 <body>
 <div class="container">
-    <h2>Welcome, <%= loggedUser.getUsername() %>!</h2>
+    <h2>
+        <a href="../editProfile.jsp" class="edit-profile" title="Edit Profile">
+            <i class="fas fa-edit"></i>  <!-- Font Awesome Edit Icon -->
+        </a>
+        Welcome, <%= loggedUser.getUsername() %>
+    </h2>
     <p>Role: <strong>Resident</strong></p>
 
     <a href="requestVisit.jsp" class="button">Request a Visit</a>
     <a href="viewHistory.jsp" class="button">View Visit History</a>
-    <a href="../editProfile.jsp" class="button">Edit Profile</a>
-
     <a href="${pageContext.request.contextPath}/LogoutServlet" class="button logout-btn">Logout</a>
-
 </div>
 </body>
 </html>
-

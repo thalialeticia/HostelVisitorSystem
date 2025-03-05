@@ -4,6 +4,8 @@ import com.example.hostelvisitorsystem.model.User;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+
 import java.util.List;
 
 @Stateless
@@ -15,8 +17,28 @@ public class UserFacade {
     public void create(User user) {
         em.persist(user);
     }
-    public void updateUser(User user) {
+
+    public User find(String id) {
+        return em.find(User.class, id);
+    }
+
+    public void update(User user) {
         em.merge(user);
+    }
+
+    public void delete(String id) {
+        User user = find(id);
+        if (user != null) {
+            em.remove(user);
+        }
+    }
+    public List<User> getAllStaff() {
+        List<User> staffList = em.createQuery("SELECT u FROM User u WHERE u.role IN (:role1, :role2)", User.class)
+                .setParameter("role1", User.Role.SECURITY_STAFF)
+                .setParameter("role2", User.Role.MANAGING_STAFF)
+                .getResultList();
+
+        return staffList;
     }
 
     public boolean isFieldUnique(String field, String value, String userId) {

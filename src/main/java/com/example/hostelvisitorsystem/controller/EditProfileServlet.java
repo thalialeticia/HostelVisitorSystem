@@ -68,7 +68,7 @@ public class EditProfileServlet extends HttpServlet {
             loggedUser.setPassword(BCrypt.hashpw(password, BCrypt.gensalt(12)));
         }
 
-        userFacade.updateUser(loggedUser);
+        userFacade.update(loggedUser);
         session.setAttribute("loggedUser", loggedUser); // Update session data
 
         session.setAttribute("success", "Profile updated successfully!");

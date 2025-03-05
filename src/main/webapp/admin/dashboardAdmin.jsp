@@ -83,7 +83,8 @@
     <h2>Welcome, <%= loggedUser.getUsername() %>!</h2>
     <p>Role: <strong>Admin (Managing Staff)</strong></p>
 
-    <a href="manageUsers.jsp" class="button">Manage Users</a>
+    <a href="${pageContext.request.contextPath}/admin/manageStaff" class="button">Manage Staff</a>
+    <a href="manageResident.jsp" class="button">Manage Resident Accounts</a>
     <a href="viewReports.jsp" class="button">View Reports</a>
     <a href="approveVisitors.jsp" class="button">Approve Visitor Requests</a>
     <a href="../editProfile.jsp" class="button">Edit Profile</a>
@@ -92,3 +93,4 @@
 </div>
 </body>
 </html>
+
