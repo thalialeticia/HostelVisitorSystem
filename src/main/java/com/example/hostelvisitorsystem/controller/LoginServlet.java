@@ -33,19 +33,22 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        if (user instanceof Resident resident) { // Pattern matching in Java 16+
-            if (resident.getStatus() != Resident.Status.ACCEPTED) {
-                request.setAttribute("error", "Your account is pending approval. Please wait or contact the admin.");
-                request.getRequestDispatcher("/login.jsp").forward(request, response);
+        if (user instanceof Resident resident) {
+            if (resident.getStatus() != Resident.Status.APPROVED) {
+                if (resident.getStatus() == Resident.Status.PENDING) {
+                    request.setAttribute("error", "Your account is pending approval. Please wait or contact the admin.");
+                } else {
+                    request.setAttribute("error", "Your account is rejected. Please contact the admin.");
+                }
+                    request.getRequestDispatcher("/login.jsp").forward(request, response);
                 return;
             }
         }
 
-        if (user != null && user.checkPassword(password)) {
+        if (user.checkPassword(password)) {
             HttpSession session = request.getSession(true);
             session.setAttribute("loggedUser", user);
 
-            // ✅ Add isSuperAdmin attribute for Managing Staff users
             if (user instanceof ManagingStaff) {
                 ManagingStaff staff = (ManagingStaff) user;
                 session.setAttribute("isSuperAdmin", staff.isSuperAdmin());
@@ -53,7 +56,6 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("isSuperAdmin", false);
             }
 
-            // Redirect based on user role
             switch (user.getRole()) {
                 case MANAGING_STAFF:
                     response.sendRedirect(request.getContextPath() + "/admin/dashboard");

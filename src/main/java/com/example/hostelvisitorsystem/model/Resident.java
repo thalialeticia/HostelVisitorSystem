@@ -11,7 +11,7 @@ public class Resident extends User {
     private Status status;
 
     public enum Status {
-        PENDING, ACCEPTED, REJECTED
+        PENDING, APPROVED, REJECTED
     }
 
     public Resident() {
