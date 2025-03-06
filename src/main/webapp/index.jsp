@@ -1,12 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Hostel Visitor Verification System</title>
+    <title>Hostel Visitor System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
     <style>
         /* General Styling */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #e3f2fd; /* Light Blue Background */
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom, #e3f2fd, #bbdefb);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -15,7 +17,7 @@
             overflow: hidden;
         }
 
-        /* Animated Title */
+        /* Title Animation */
         .title-container {
             font-size: 50px;
             font-weight: bold;
@@ -49,22 +51,36 @@
 
         /* Main Content */
         .container {
-            background: #ffffff;
+            background: white;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            width: 400px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
             text-align: center;
+            width: 450px;
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 1s ease-out, transform 1s ease-out;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: bold;
+            color: #0d47a1;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #1565c0;
+            font-weight: 600;
+            margin-bottom: 20px;
         }
 
         /* Navigation Menu */
         .nav-menu {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             margin-top: 20px;
             opacity: 0;
             transform: translateY(20px);
@@ -73,47 +89,41 @@
 
         .nav-menu a {
             text-decoration: none;
-            background-color: #1e88e5;
+            background: #1e88e5;
             color: white;
             padding: 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 16px;
+            font-weight: 500;
             transition: background 0.3s ease, transform 0.2s ease;
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             position: relative;
             overflow: hidden;
+            box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
         }
 
         .nav-menu a:hover {
-            background-color: #1565c0;
+            background: #1565c0;
             transform: scale(1.05);
-        }
-
-        /* Hover Effect */
-        .nav-menu a::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            bottom: 0;
-            background: white;
-            transform: scaleX(0);
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .nav-menu a:hover::before {
-            transform: scaleX(1);
         }
 
         /* Footer */
         .footer {
-            margin-top: 15px;
+            margin-top: 20px;
             font-size: 12px;
             color: #666;
             opacity: 0;
             transition: opacity 1s ease-out 1s;
         }
+
+        /* Icon Styling */
+        .nav-menu a i {
+            font-size: 18px;
+        }
+
     </style>
 </head>
 <body>
@@ -138,13 +148,13 @@
 
 <!-- Main Content -->
 <div class="container" id="mainContent">
-    <h1>Welcome to the Hostel Visitor Verification System</h1>
-    <h2>Navigation</h2>
+    <h1>Welcome to the Hostel Visitor System</h1>
+    <h2>Choose Your Action</h2>
 
     <div class="nav-menu" id="navMenu">
-        <a href="resident/register.jsp">Resident Registration</a>
-        <a href="login.jsp">Login</a>
-        <a href="about.jsp">About Us</a>
+        <a href="resident/register.jsp"><i class="fa-solid fa-user-plus"></i> Register as a Resident</a>
+        <a href="login.jsp"><i class="fa-solid fa-sign-in-alt"></i> Login to Your Account</a>
+        <a href="about.jsp"><i class="fa-solid fa-circle-info"></i> Learn More About Us</a>
     </div>
 
     <p class="footer" id="footer">© 2025 Hostel Management. All rights reserved.</p>

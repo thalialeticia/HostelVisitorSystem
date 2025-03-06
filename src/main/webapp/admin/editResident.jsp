@@ -1,8 +1,8 @@
 <%--
   Created by IntelliJ IDEA.
   User: leticiathalia
-  Date: 05/03/25
-  Time: 4.05 PM
+  Date: 06/03/25
+  Time: 4.13 PM
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -11,16 +11,16 @@
 
 <%
     String id = request.getParameter("id");
-    User staff = (User) request.getAttribute("staff");
+    User resident = (User) request.getAttribute("resident");
     User currentUser = (User) session.getAttribute("loggedUser");
 
-    if (staff == null) {
-        response.sendRedirect("manageStaff.jsp?error=StaffNotFound");
+    if (resident == null) {
+        response.sendRedirect("manageResident.jsp?error=ResidentNotFound");
         return;
     }
 
     // Extract country code from phone number
-    String fullPhone = staff.getPhone();
+    String fullPhone = resident.getPhone();
     String countryCode = "+60"; // Default Malaysia
     String phoneNumber = fullPhone;
 
@@ -39,15 +39,11 @@
     } else if (fullPhone.startsWith("+60")) {
         phoneNumber = fullPhone.substring(3);
     }
-
-    // Check if the user is a Managing Staff & Super Admin
-    boolean isCurrentUserSuperAdmin = (currentUser instanceof ManagingStaff) && ((ManagingStaff) currentUser).isSuperAdmin();
-    boolean isEditingSuperAdmin = (staff instanceof ManagingStaff) && ((ManagingStaff) staff).isSuperAdmin();
 %>
 
 <html>
 <head>
-    <title>Edit Staff</title>
+    <title>Edit Resident</title>
     <style>
         /* General Styling */
         body {
@@ -81,15 +77,6 @@
             color: #0d47a1;
             font-size: 22px;
             margin-bottom: 15px;
-        }
-
-        /* Error Messages */
-        .error-message {
-            color: red;
-            font-size: 12px;
-            text-align: left;
-            display: none;
-            margin-bottom: 5px;
         }
 
         /* Hide Error Box if No Error */
@@ -180,12 +167,33 @@
             color: #757575; /* Make disabled text look inactive */
         }
 
+        /* Error Messages */
+        .error-message {
+            color: red;
+            font-size: 12px;
+            display: none;
+            text-align: left;
+            margin-bottom: 5px;
+        }
+
+        /* Error Message Styling */
+        .error-box {
+            background-color: #ffebee;
+            color: #d32f2f;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 15px;
+            display: ${not empty error ? "block" : "none"};
+        }
+
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Edit Staff</h2>
+    <h2>Edit Resident</h2>
 
     <!-- Error Message -->
     <% String error = (String) request.getAttribute("error"); %>
@@ -213,60 +221,46 @@
     </script>
 
 
-    <form action="${pageContext.request.contextPath}/admin/manageStaff?action=update" method="post" onsubmit="return validateForm()">
+    <form action="${pageContext.request.contextPath}/admin/manageResident?action=update" method="post" onsubmit="return validateForm()">
         <input type="hidden" name="id" value="<%= id %>">
 
         <!-- Username (Editable) -->
-        <input type="text" name="username" value="<%= staff.getUsername() %>" placeholder="Username" required>
+        <input type="text" name="username" value="<%= resident.getUsername() %>" placeholder="Username" required>
 
         <!-- Password Field (Optional) -->
-        <input type="password" id="password" name="password" placeholder="New Password (Leave blank to keep current)" onkeyup="validatePassword()">
+        <input type="password" id="password" name="password" placeholder="New Password (Leave blank to keep current)" required onkeyup="validatePassword()">
         <p class="error-message" id="passwordError">Password must be at least 5 characters long and contain at least 1 number.</p>
 
-        <input type="text" name="name" value="<%= staff.getName() %>" required>
+        <input type="text" name="name" value="<%= resident.getName() %>" placeholder="Full Name" required>
 
         <!-- Gender Selection -->
         <select name="gender">
-            <option value="MALE" <%= staff.getGender().equals("MALE") ? "selected" : "" %>>Male</option>
-            <option value="FEMALE" <%= staff.getGender().equals("FEMALE") ? "selected" : "" %>>Female</option>
+            <option value="MALE" <%= resident.getGender().equals("MALE") ? "selected" : "" %>>Male</option>
+            <option value="FEMALE" <%= resident.getGender().equals("FEMALE") ? "selected" : "" %>>Female</option>
         </select>
 
         <!-- Phone Number with Country Code -->
         <div class="phone-container">
             <select id="countryCode" name="countryCode">
-                <option value="+60" <%= staff.getPhone().startsWith("+60") ? "selected" : "" %>>🇲🇾 +60</option>
-                <option value="+65" <%= staff.getPhone().startsWith("+65") ? "selected" : "" %>>🇸🇬 +65</option>
-                <option value="+1" <%= staff.getPhone().startsWith("+1") ? "selected" : "" %>>🇺🇸 +1</option>
-                <option value="+44" <%= staff.getPhone().startsWith("+44") ? "selected" : "" %>>🇬🇧 +44</option>
-                <option value="+91" <%= staff.getPhone().startsWith("+91") ? "selected" : "" %>>🇮🇳 +91</option>
+                <option value="+60" <%= resident.getPhone().startsWith("+60") ? "selected" : "" %>>🇲🇾 +60</option>
+                <option value="+65" <%= resident.getPhone().startsWith("+65") ? "selected" : "" %>>🇸🇬 +65</option>
+                <option value="+1" <%= resident.getPhone().startsWith("+1") ? "selected" : "" %>>🇺🇸 +1</option>
+                <option value="+44" <%= resident.getPhone().startsWith("+44") ? "selected" : "" %>>🇬🇧 +44</option>
+                <option value="+91" <%= resident.getPhone().startsWith("+91") ? "selected" : "" %>>🇮🇳 +91</option>
             </select>
-            <input type="text" id="phone" name="phone" value="<%= staff.getPhone().substring(3) %>" placeholder="Phone Number" required onkeyup="validatePhone()">
+            <input type="text" id="phone" name="phone" value="<%= resident.getPhone().substring(3) %>" placeholder="Phone Number" required onkeyup="validatePhone()">
         </div>
-        <p class="error-message" id="phoneError">Enter a valid phone number.</p>
+        <p className=" error-message" id="phoneError">Enter a valid phone number.</p>
 
-        <input type="text" id="ic" name="IC" value="<%= staff.getIC() %>" placeholder="Malaysian IC Number" required onkeyup="validateIC()">
+        <input type="text" id="ic" name="IC" value="<%= resident.getIC() %>" placeholder="Malaysian IC Number" required onkeyup="validateIC()">
         <p class="error-message" id="icError">IC number must be exactly 12 digits (e.g. 010203041234).</p>
 
-        <input type="email" name="email" value="<%= staff.getEmail() %>" placeholder="Email" required>
+        <input type="email" name="email" value="<%= resident.getEmail() %>" placeholder="Email" required>
 
-        <!-- Role Selection (Only Super Admin Can Edit) -->
-        <select name="role" id="roleSelect" <%= isCurrentUserSuperAdmin ? "" : "disabled class='disabled-field'" %>>
-            <option value="SECURITY_STAFF" <%= staff.getRole().name().equals("SECURITY_STAFF") ? "selected" : "" %>>Security Staff</option>
-            <option value="MANAGING_STAFF" <%= staff.getRole().name().equals("MANAGING_STAFF") ? "selected" : "" %>>Managing Staff</option>
-        </select>
-
-        <!-- Super Admin Checkbox (Only Super Admin Can Edit) -->
-        <div class="checkbox-container" id="superAdminContainer">
-            <input type="checkbox" id="superAdmin" name="superAdmin"
-                <%= isEditingSuperAdmin ? "checked" : "" %>
-                <%= isCurrentUserSuperAdmin ? "" : "disabled class='disabled-field'" %>>
-            <label for="superAdmin" style="color: #757575;">Make Super Admin</label>
-        </div>
-
-        <button type="submit" class="submit-btn">Update Staff</button>
+        <button type="submit" class="submit-btn">Update Resident</button>
     </form>
 
-    <a href="${pageContext.request.contextPath}/admin/manageStaff" class="back-btn">← Back to Manage Staff</a>
+    <a href="${pageContext.request.contextPath}/admin/manageResident" class="back-btn">← Back to Manage Resident</a>
 </div>
 
 <script>
@@ -311,19 +305,12 @@
             return true;
         }
     }
+
     function validateForm() {
-        let password = document.getElementById("password").value.trim();
-
-        if (password.length > 0) {
-            if (!validatePassword()) {
-                return false;
-            }
-        }
-
-        return validatePhone() && validateIC();
+        return validatePassword() && validatePhone() && validateIC();
     }
-
 </script>
 
 </body>
 </html>
+

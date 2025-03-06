@@ -87,6 +87,18 @@
             display: block;
         }
 
+        /* Hide Error Box if No Error */
+        .error-box {
+            background-color: #ffebee;
+            color: #d32f2f;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 15px;
+            display: ${not empty error ? "block" : "none"};
+        }
+
         /* Submit & Back Button */
         .submit-btn, .back-btn {
             background-color: #1e88e5;

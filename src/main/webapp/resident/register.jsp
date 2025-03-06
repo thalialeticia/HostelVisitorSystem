@@ -108,15 +108,32 @@
 <body>
 
 <div class="container">
-
-    <!-- ✅ Display Error Message -->
-    <c:if test="${not empty error}">
-        <div class="error-box">
-            <p>${error}</p>
-        </div>
-    </c:if>
-
     <h2>Resident Registration</h2>
+
+    <!-- Error Message -->
+    <% String error = (String) request.getAttribute("error"); %>
+    <% if (error != null) { %>
+    <div class="error-box" id="errorMessage">
+        <p><%= error %></p>
+    </div>
+    <% } %>
+
+    <!-- JavaScript to Remove Error Message After 3 Seconds -->
+    <script>
+        setTimeout(function () {
+            let errorBox = document.getElementById('errorMessage');
+            if (errorBox) {
+                errorBox.style.display = 'none';
+            }
+
+            // Clear error sessloggedInUserion variable via AJAX
+            fetch('${pageContext.request.contextPath}/ClearMessagesServlet', { method: 'POST' })
+                .then(response => response.text())
+                .then(data => console.log('Error message cleared:', data))
+                .catch(error => console.error('Error clearing session message:', error));
+
+        }, 3000);
+    </script>
 
     <form action="${pageContext.request.contextPath}/RegisterServlet" method="post" onsubmit="return validateForm()">
         <input type="text" name="username" placeholder="Username" required>
@@ -146,7 +163,6 @@
         </div>
         <p class="error-message" id="phoneError">Enter a valid phone number.</p>
 
-        <!-- Malaysian IC Number Validation -->
         <input type="text" id="ic" name="IC" placeholder="Malaysian IC Number" required onkeyup="validateIC()">
         <p class="error-message" id="icError">IC number must be exactly 12 digits (e.g. 010203041234).</p>
 
