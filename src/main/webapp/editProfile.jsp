@@ -141,7 +141,7 @@
     <h2>Edit Profile</h2>
 
     <form action="${pageContext.request.contextPath}/EditProfileServlet" method="post" onsubmit="return validateForm()">
-        <input type="text" name="username" value="<%= loggedUser.getUsername() %>" readonly>
+        <input type="text" name="username" value="<%= loggedUser.getUsername() %>" placeholder="Username" required>
 
         <input type="password" id="password" name="password" placeholder="New Password (Leave blank to keep current)" onkeyup="validatePassword()">
         <p class="error-message" id="passwordError">Password must be at least 5 characters long and contain at least 1 number.</p>

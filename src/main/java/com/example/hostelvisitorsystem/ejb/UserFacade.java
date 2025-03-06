@@ -37,8 +37,10 @@ public class UserFacade {
         User user = find(id);
         if (user != null) {
             em.remove(em.contains(user) ? user : em.merge(user));
+            em.flush();
         }
     }
+
 
     public List<User> getAllStaff() {
         List<User> staffList = em.createQuery("SELECT u FROM User u WHERE u.role IN (:role1, :role2)", User.class)

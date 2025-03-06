@@ -228,7 +228,7 @@
         <input type="text" name="username" value="<%= resident.getUsername() %>" placeholder="Username" required>
 
         <!-- Password Field (Optional) -->
-        <input type="password" id="password" name="password" placeholder="New Password (Leave blank to keep current)" required onkeyup="validatePassword()">
+        <input type="password" id="password" name="password" placeholder="New Password (Leave blank to keep current)" onkeyup="validatePassword()">
         <p class="error-message" id="passwordError">Password must be at least 5 characters long and contain at least 1 number.</p>
 
         <input type="text" name="name" value="<%= resident.getName() %>" placeholder="Full Name" required>
@@ -250,7 +250,7 @@
             </select>
             <input type="text" id="phone" name="phone" value="<%= resident.getPhone().substring(3) %>" placeholder="Phone Number" required onkeyup="validatePhone()">
         </div>
-        <p className=" error-message" id="phoneError">Enter a valid phone number.</p>
+        <p class="error-message" id="phoneError">Enter a valid phone number.</p>
 
         <input type="text" id="ic" name="IC" value="<%= resident.getIC() %>" placeholder="Malaysian IC Number" required onkeyup="validateIC()">
         <p class="error-message" id="icError">IC number must be exactly 12 digits (e.g. 010203041234).</p>
@@ -307,8 +307,17 @@
     }
 
     function validateForm() {
-        return validatePassword() && validatePhone() && validateIC();
+        let password = document.getElementById("password").value.trim();
+
+        if (password.length > 0) {
+            if (!validatePassword()) {
+                return false;
+            }
+        }
+
+        return validatePhone() && validateIC();
     }
+
 </script>
 
 </body>

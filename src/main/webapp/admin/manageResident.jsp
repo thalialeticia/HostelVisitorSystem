@@ -215,12 +215,12 @@
     }
 
     function editResident(id) {
-        window.location.href = "${pageContext.request.contextPath}/admin/editResident?id=" + id;
+        window.location.href = "${pageContext.request.contextPath}/admin/manageResident?action=edit&id=" + id;
     }
 
     function deleteResident(id) {
-        if (confirm("Are you sure you want to delete this staff member?")) {
-            window.location.href = "${pageContext.request.contextPath}/admin/deleteResident?id=" + id;
+        if (confirm("Are you sure you want to delete this resident?")) {
+            window.location.href = "${pageContext.request.contextPath}/admin/manageResident?action=delete&id=" + id;
         }
     }
 

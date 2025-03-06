@@ -26,7 +26,8 @@ CREATE TABLE users (
 -- Create Residents Table
 CREATE TABLE residents (
                            id CHAR(36) PRIMARY KEY,
-                           FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
+                           FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE,
+                           status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'PENDING'
 );
 
 -- Create Managing Staff Table (with department column)
@@ -83,8 +84,13 @@ VALUES
     (UUID(), 'resident4', '$2a$12$dVOTAfhPVdOlgir6QPCNVOZHCl2kL/n9Gd8BvaEgsS8TWT2Y1VwuC', 'Resident Four', 'MALE', '0123456781', '923456789012', 'resident4@example.com', 'RESIDENT'),
     (UUID(), 'resident5', '$2a$12$zkw2fRbMgHpEyUfWv9VmW.NcSQgusY9bSc.T7P6fQn7CxlM5t2LSy', 'Resident Five', 'FEMALE', '0123456780', '1023456789012', 'resident5@example.com', 'RESIDENT');
 
-INSERT INTO residents (id)
-SELECT id FROM users WHERE role='RESIDENT';
+INSERT INTO residents (id, status)
+VALUES
+    ((SELECT id FROM users WHERE username='resident1'), 'APPROVED'),
+    ((SELECT id FROM users WHERE username='resident2'), 'PENDING'),
+    ((SELECT id FROM users WHERE username='resident3'), 'PENDING'),
+    ((SELECT id FROM users WHERE username='resident4'), 'PENDING'),
+    ((SELECT id FROM users WHERE username='resident5'), 'REJECTED');
 
 -- Insert Security Staff (10 Users)
 INSERT INTO users (id, username, password, name, gender, phone, IC, email, role)

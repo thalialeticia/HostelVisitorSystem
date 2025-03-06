@@ -2,6 +2,7 @@ package com.example.hostelvisitorsystem.controller;
 
 import com.example.hostelvisitorsystem.ejb.UserFacade;
 import com.example.hostelvisitorsystem.model.ManagingStaff;
+import com.example.hostelvisitorsystem.model.Resident;
 import com.example.hostelvisitorsystem.model.User;
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
@@ -24,8 +25,21 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        // Retrieve user from database
         User user = userFacade.findByUsername(username);
+
+        if (user == null) {
+            request.setAttribute("error", "Invalid username or password.");
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            return;
+        }
+
+        if (user instanceof Resident resident) { // Pattern matching in Java 16+
+            if (resident.getStatus() != Resident.Status.ACCEPTED) {
+                request.setAttribute("error", "Your account is pending approval. Please wait or contact the admin.");
+                request.getRequestDispatcher("/login.jsp").forward(request, response);
+                return;
+            }
+        }
 
         if (user != null && user.checkPassword(password)) {
             HttpSession session = request.getSession(true);
@@ -54,7 +68,6 @@ public class LoginServlet extends HttpServlet {
                     response.sendRedirect("login.jsp?error=UnknownRole");
             }
         } else {
-            // ❌ Invalid credentials
             request.setAttribute("error", "Invalid username or password");
             request.getRequestDispatcher("/login.jsp").forward(request, response);
         }
