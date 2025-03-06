@@ -7,6 +7,8 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page import="com.example.hostelvisitorsystem.model.ManagingStaff" %>
+
 <html>
 <head>
     <title>Add New Staff</title>
@@ -147,14 +149,32 @@
 <div class="container">
     <h2>Add New Staff</h2>
 
-    <!-- Pop-up Error Display -->
-    <c:if test="${not empty error}">
-        <div class="error-box">
-            <p>${error}</p>
-        </div>
-    </c:if>
+    <!-- Error Message -->
+    <% String error = (String) request.getAttribute("error"); %>
+    <% if (error != null) { %>
+    <div class="error-box" id="errorMessage">
+        <p><%= error %></p>
+    </div>
+    <% } %>
 
-    <form action="${pageContext.request.contextPath}/admin/manageStaff" method="post" onsubmit="return validateForm()">
+    <!-- JavaScript to Remove Error Message After 3 Seconds -->
+    <script>
+        setTimeout(function () {
+            let errorBox = document.getElementById('errorMessage');
+            if (errorBox) {
+                errorBox.style.display = 'none';
+            }
+
+            // Clear error session variable via AJAX
+            fetch('${pageContext.request.contextPath}/ClearMessagesServlet', { method: 'POST' })
+                .then(response => response.text())
+                .then(data => console.log('Error message cleared:', data))
+                .catch(error => console.error('Error clearing session message:', error));
+
+        }, 3000);
+    </script>
+
+    <form action="${pageContext.request.contextPath}/admin/manageStaff?action=add" method="post" onsubmit="return validateForm()">
         <input type="text" name="username" placeholder="Username" required>
 
         <!-- Password Field with Validation -->
@@ -257,7 +277,9 @@
         let role = document.getElementById("roleSelect").value;
         let superAdminContainer = document.getElementById("superAdminContainer");
 
-        superAdminContainer.style.display = role === "MANAGING_STAFF" ? "flex" : "none";
+        let isLoggedInSuperAdmin = <%= (session.getAttribute("loggedUser") instanceof ManagingStaff) && ((ManagingStaff) session.getAttribute("loggedUser")).isSuperAdmin() %>;
+
+        superAdminContainer.style.display = (role === "MANAGING_STAFF" && isLoggedInSuperAdmin) ? "flex" : "none";
     }
 </script>
 

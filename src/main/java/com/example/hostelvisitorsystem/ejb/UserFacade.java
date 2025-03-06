@@ -25,8 +25,13 @@ public class UserFacade {
     }
 
     public void update(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
         em.merge(user);
+        em.flush();
     }
+
 
     public void delete(String id) {
         User user = find(id);

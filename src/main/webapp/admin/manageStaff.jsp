@@ -9,6 +9,8 @@
 <%@ page import="com.example.hostelvisitorsystem.model.User" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="com.example.hostelvisitorsystem.model.ManagingStaff" %>
+
 
 <%
     List<User> staffList = (List<User>) request.getAttribute("staffList");
@@ -143,21 +145,41 @@
 <body>
 
 <div class="container">
-    <!-- Success Message (Hidden by Default) -->
-    <c:if test="${not empty success}">
-        <div class="success-box">
+    <!-- Success Message (Only if there is no error) -->
+    <c:if test="${not empty success and empty error}">
+        <div class="success-box" id="successMessage">
             <p>${success}</p>
         </div>
-        <c:remove var="success" scope="session"/>
     </c:if>
 
-    <!-- Error Message (Hidden by Default) -->
+    <!-- Error Message -->
     <c:if test="${not empty error}">
-        <div class="error-box">
+        <div class="error-box" id="errorMessage">
             <p>${error}</p>
         </div>
-        <c:remove var="error" scope="session"/>
     </c:if>
+
+    <!-- JavaScript to Hide Messages and Remove from Session After 3 Seconds -->
+    <script>
+        setTimeout(function () {
+            let successBox = document.getElementById('successMessage');
+            let errorBox = document.getElementById('errorMessage');
+
+            if (successBox) {
+                successBox.style.display = 'none';
+            }
+            if (errorBox) {
+                errorBox.style.display = 'none';
+            }
+
+            // Send AJAX request to clear session attributes
+            fetch('${pageContext.request.contextPath}/ClearMessagesServlet', { method: 'POST' })
+                .then(response => response.text())
+                .then(data => console.log('Session messages cleared:', data))
+                .catch(error => console.error('Error clearing session messages:', error));
+
+        }, 3000); // 3 seconds
+    </script>
 
     <h2>Manage Staff Accounts</h2>
 
@@ -178,14 +200,20 @@
         </thead>
         <tbody id="staffTable">
         <% if (staffList != null && !staffList.isEmpty()) {
-            for (User staff : staffList) { %>
+            for (User staff : staffList) {
+                boolean isSuperAdmin = (staff instanceof ManagingStaff) && ((ManagingStaff) staff).isSuperAdmin();
+        %>
         <tr>
             <td><%= staff.getName() %></td>
             <td><%= staff.getEmail() %></td>
             <td><%= staff.getRole() %></td>
             <td>
+                <% if (!isSuperAdmin) { %>  <!-- ✅ Hide buttons for Super Admins -->
                 <button class="action-btn edit-btn" onclick="editStaff('<%= staff.getId() %>')">Edit</button>
                 <button class="action-btn delete-btn" onclick="deleteStaff('<%= staff.getId() %>')">Delete</button>
+                <% } else { %>
+                <span style="color: #757575; font-weight: bold;">Super Admin</span>
+                <% } %>
             </td>
         </tr>
         <% }
@@ -217,12 +245,12 @@
     }
 
     function editStaff(id) {
-        window.location.href = "${pageContext.request.contextPath}/admin/editStaff?id=" + id;
+        window.location.href = "${pageContext.request.contextPath}/admin/manageStaff?action=edit&id=" + id;
     }
 
     function deleteStaff(id) {
         if (confirm("Are you sure you want to delete this staff member?")) {
-            window.location.href = "${pageContext.request.contextPath}/admin/deleteStaff?id=" + id;
+            window.location.href = "${pageContext.request.contextPath}/admin/manageStaff?action=delete&id=" + id;
         }
     }
 
