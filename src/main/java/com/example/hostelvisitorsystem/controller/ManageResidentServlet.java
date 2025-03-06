@@ -2,6 +2,7 @@ package com.example.hostelvisitorsystem.controller;
 
 import com.example.hostelvisitorsystem.ejb.UserFacade;
 import com.example.hostelvisitorsystem.model.ManagingStaff;
+import com.example.hostelvisitorsystem.model.Resident;
 import com.example.hostelvisitorsystem.model.User;
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
@@ -26,6 +27,10 @@ public class ManageResidentServlet extends HttpServlet {
             handleEditForm(request, response);
         } else if ("delete".equals(action)) {
             handleDelete(request, response);
+        } else if ("approve".equals(action)) {
+            handleApprove(request, response);
+        } else if ("reject".equals(action)) {
+            handleReject(request, response);
         } else {
             populateManageResidentPage(request, response);
         }
@@ -40,6 +45,54 @@ public class ManageResidentServlet extends HttpServlet {
         } else {
             populateManageResidentPage(request, response);
         }
+    }
+
+    private void handleApprove(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String id = request.getParameter("id");
+
+        if (id == null || id.isEmpty()) {
+            request.getSession().setAttribute("error", "Invalid resident ID.");
+            response.sendRedirect("manageResident");
+            return;
+        }
+
+        User user = userFacade.find(id);
+        if (!(user instanceof Resident)) {
+            request.getSession().setAttribute("error", "Resident not found.");
+            response.sendRedirect("manageResident");
+            return;
+        }
+
+        Resident resident = (Resident) user;
+        resident.setStatus(Resident.Status.APPROVED);
+        userFacade.update(resident);
+
+        request.getSession().setAttribute("success", "Resident approved successfully.");
+        response.sendRedirect("manageResident");
+    }
+
+    private void handleReject(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String id = request.getParameter("id");
+
+        if (id == null || id.isEmpty()) {
+            request.getSession().setAttribute("error", "Invalid resident ID.");
+            response.sendRedirect("manageResident");
+            return;
+        }
+
+        User user = userFacade.find(id);
+        if (!(user instanceof Resident)) {
+            request.getSession().setAttribute("error", "Resident not found.");
+            response.sendRedirect("manageResident");
+            return;
+        }
+
+        Resident resident = (Resident) user;
+        resident.setStatus(Resident.Status.REJECTED);
+        userFacade.update(resident);
+
+        request.getSession().setAttribute("success", "Resident rejected successfully.");
+        response.sendRedirect("manageResident");
     }
 
     private void handleEditForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

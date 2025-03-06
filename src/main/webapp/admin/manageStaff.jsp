@@ -22,7 +22,11 @@
 <html>
 <head>
     <title>Manage Staff Accounts</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
     <style>
+        /* General body styling */
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(to right, #e3f2fd, #bbdefb);
@@ -30,33 +34,38 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
         }
 
+        /* Container styling */
         .container {
             background: white;
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
             text-align: center;
-            width: 800px;
+            width: 90%;
+            max-width: 900px;
             opacity: 0;
             transform: translateY(20px);
             animation: fadeIn 1s ease-out forwards;
         }
 
+        /* Fade-in animation */
         @keyframes fadeIn {
             0% { opacity: 0; transform: translateY(20px); }
             100% { opacity: 1; transform: translateY(0); }
         }
 
+        /* Header title */
         h2 {
             color: #0d47a1;
             font-size: 24px;
             margin-bottom: 15px;
         }
 
+        /* Search bar */
         .search-container {
             margin-bottom: 15px;
         }
@@ -66,8 +75,10 @@
             width: 80%;
             border: 1px solid #90caf9;
             border-radius: 6px;
+            font-size: 14px;
         }
 
+        /* Table styling */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -78,6 +89,7 @@
             border: 1px solid #90caf9;
             padding: 10px;
             text-align: center;
+            font-size: 14px;
         }
 
         th {
@@ -85,17 +97,61 @@
             color: white;
         }
 
+        /* Button styling */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px; /* Adds spacing between Edit & Delete buttons */
+        }
+
+        /* General button styles */
         .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
             padding: 6px 12px;
             border: none;
             border-radius: 5px;
             color: white;
             cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease, transform 0.2s ease;
+            text-decoration: none;
         }
 
-        .edit-btn { background-color: #fbc02d; }
-        .delete-btn { background-color: #e53935; }
+        /* Edit button */
+        .edit-btn {
+            background-color: #fbc02d; /* Yellow */
+        }
 
+        .edit-btn:hover {
+            background-color: #f9a825; /* Darker Yellow */
+            transform: scale(1.05);
+        }
+
+        /* Delete button */
+        .delete-btn {
+            background-color: #e53935; /* Red */
+        }
+
+        .delete-btn:hover {
+            background-color: #c62828; /* Darker Red */
+            transform: scale(1.05);
+        }
+
+        /* Icons inside buttons */
+        .action-btn i {
+            font-size: 16px;
+        }
+
+        /* Super Admin text styling */
+        .super-admin-label {
+            color: #757575;
+            font-weight: bold;
+        }
+
+        /* Button container for navigation */
         .button-container {
             display: flex;
             justify-content: center;
@@ -105,6 +161,7 @@
             text-align: center;
         }
 
+        /* Navigation buttons */
         .button {
             display: inline-block;
             padding: 12px 20px;
@@ -121,13 +178,14 @@
             transform: scale(1.05);
         }
 
+        /* Success and error message boxes */
         .success-box, .error-box {
             text-align: center;
             margin-bottom: 10px;
             padding: 10px;
             border-radius: 6px;
             font-size: 14px;
-            display: none; /* ✅ Initially hidden */
+            display: none;
         }
 
         .success-box {
@@ -139,6 +197,28 @@
             background-color: #ffebee;
             color: #d32f2f;
         }
+
+        /* Responsive adjustments */
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 20px;
+            }
+
+            input[type="text"] {
+                width: 100%;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+        }
+
 
     </style>
 </head>
@@ -209,12 +289,19 @@
             <td><%= staff.getRole() %></td>
             <td>
                 <% if (!isSuperAdmin) { %>  <!-- ✅ Hide buttons for Super Admins -->
-                <button class="action-btn edit-btn" onclick="editStaff('<%= staff.getId() %>')">Edit</button>
-                <button class="action-btn delete-btn" onclick="deleteStaff('<%= staff.getId() %>')">Delete</button>
+                <div class="action-buttons">
+                    <button class="action-btn edit-btn" onclick="editStaff('<%= staff.getId() %>')">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="action-btn delete-btn" onclick="deleteStaff('<%= staff.getId() %>')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
                 <% } else { %>
-                <span style="color: #757575; font-weight: bold;">Super Admin</span>
+                <span class="super-admin-label">Super Admin</span>
                 <% } %>
             </td>
+
         </tr>
         <% }
         } else { %>

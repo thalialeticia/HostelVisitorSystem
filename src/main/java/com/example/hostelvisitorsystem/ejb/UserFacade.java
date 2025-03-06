@@ -1,5 +1,6 @@
 package com.example.hostelvisitorsystem.ejb;
 
+import com.example.hostelvisitorsystem.model.Resident;
 import com.example.hostelvisitorsystem.model.User;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
@@ -40,7 +41,6 @@ public class UserFacade {
             em.flush();
         }
     }
-
 
     public List<User> getAllStaff() {
         List<User> staffList = em.createQuery("SELECT u FROM User u WHERE u.role IN (:role1, :role2)", User.class)
