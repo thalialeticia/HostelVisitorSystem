@@ -29,6 +29,8 @@ public class ResidentDashboardServlet extends HttpServlet {
 
         if ("cancel".equals(action)) {
             handleCancel(request, response);
+        } else if ("view".equals(action)) {
+            handleViewRequest(request, response);
         } else {
             populateResidentDashboardPage(request, response);
         }
@@ -152,4 +154,40 @@ public class ResidentDashboardServlet extends HttpServlet {
 
         request.getRequestDispatcher("/resident/dashboardResident.jsp").forward(request, response);
     }
+
+    private void handleViewRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        User loggedUser = (session != null) ? (User) session.getAttribute("loggedUser") : null;
+
+        if (loggedUser == null || !(loggedUser instanceof Resident)) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        String id = request.getParameter("id");
+
+        if (id == null || id.isEmpty()) {
+            session.setAttribute("error", "Invalid visitor request ID.");
+            response.sendRedirect(request.getContextPath() + "/resident/dashboardResident");
+            return;
+        }
+
+        VisitRequest visitRequest = visitRequestFacade.find(id);
+
+        if (visitRequest == null) {
+            session.setAttribute("error", "Visit request not found.");
+            response.sendRedirect(request.getContextPath() + "/resident/dashboardResident");
+            return;
+        }
+
+        if (!visitRequest.getResident().getId().equals(loggedUser.getId())) {
+            session.setAttribute("error", "Unauthorized action.");
+            response.sendRedirect(request.getContextPath() + "/resident/dashboardResident");
+            return;
+        }
+
+        request.setAttribute("visitRequest", visitRequest);
+        request.getRequestDispatcher("/resident/viewRequestVisit.jsp").forward(request, response);
+    }
+
 }

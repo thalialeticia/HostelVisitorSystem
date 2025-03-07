@@ -236,11 +236,100 @@
             box-shadow: none;
         }
 
+        /* Success and error message boxes */
+        .success-box, .error-box {
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .success-box {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .error-box {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        /* Search bar */
+        .search-container {
+            display: flex;
+            justify-content: center; /* Centers the search bar */
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .search-container input {
+            width: 100%;
+            max-width: 400px; /* Restricts width */
+            padding: 12px 40px 12px 15px; /* Space for icon */
+            border: 1px solid #90caf9;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .search-container input:focus {
+            border-color: #1e88e5;
+            box-shadow: 0px 0px 8px rgba(30, 136, 229, 0.4);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            font-size: 16px;
+            color: #1e88e5;
+        }
 
     </style>
 </head>
 <body>
 <div class="container">
+    <!-- Success Message (Only if there is no error) -->
+    <c:if test="${not empty success and empty error}">
+        <div class="success-box" id="successMessage">
+            <p>${success}</p>
+        </div>
+    </c:if>
+
+    <!-- Error Message -->
+    <c:if test="${not empty error}">
+        <div class="error-box" id="errorMessage">
+            <p>${error}</p>
+        </div>
+    </c:if>
+
+    <!-- JavaScript to Hide Messages and Remove from Session After 3 Seconds -->
+    <script>
+        setTimeout(function () {
+            let successBox = document.getElementById('successMessage');
+            let errorBox = document.getElementById('errorMessage');
+
+            if (successBox) {
+                successBox.style.display = 'none';
+            }
+            if (errorBox) {
+                errorBox.style.display = 'none';
+            }
+
+            // Send AJAX request to clear session attributes
+            fetch('${pageContext.request.contextPath}/ClearMessagesServlet', { method: 'POST' })
+                .then(response => response.text())
+                .then(data => console.log('Session messages cleared:', data))
+                .catch(error => console.error('Error clearing session messages:', error));
+
+        }, 3000); // 3 seconds
+    </script>
+
     <a href="../editProfile.jsp" class="edit-profile" title="Edit Profile">
         <i class="fa-solid fa-user-pen"></i>
     </a>
@@ -251,6 +340,12 @@
     <!-- Request Visit Button -->
     <div class="dashboard-options">
         <a href="addRequestVisit.jsp" class="button"><i class="fa-solid fa-calendar-check"></i> Request a Visit</a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="🔍 Search by Name or Status..." onkeyup="searchRequest()">
+        <i class="fa-solid fa-search search-icon"></i>
     </div>
 
     <!-- Check & Update Status Table -->
@@ -268,10 +363,8 @@
         </thead>
         <tbody id="table-body">
         <%
-            int displayedRows = 0;
             if (!visitRequests.isEmpty()) {
                 for (VisitRequest visitReq : visitRequests) {
-                    displayedRows++;
         %>
         <tr>
             <td><%= visitReq.getVisitorName() %></td>
@@ -293,20 +386,17 @@
             </td>
         </tr>
         <%
-                }
             }
-            // Fill empty rows if less than 5
-            for (; displayedRows < 5; displayedRows++) {
+        } else { // If there are no records, show a message
         %>
         <tr>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
+            <td colspan="6" style="text-align: center; font-style: italic; color: #757575;">
+                No visit requests found.
+            </td>
         </tr>
-        <% } %>
+        <%
+            }
+        %>
         </tbody>
 
     </table>
@@ -325,8 +415,19 @@
 </div>
 
 <script>
+    function searchRequest() {
+        let input = document.getElementById("searchInput").value.toLowerCase();
+        let rows = document.querySelectorAll("#table-body tr");
+
+        rows.forEach(row => {
+            let name = row.cells[0].textContent.toLowerCase();
+            let status = row.cells[4].textContent.toLowerCase();
+            row.style.display = (name.includes(input) || status.includes(input)) ? "" : "none";
+        });
+    }
+
     function viewRequest(requestId) {
-        window.location.href = "viewRequest.jsp?id=" + requestId;
+        window.location.href = "${pageContext.request.contextPath}/resident/dashboardResident?action=view&id=" + requestId;
     }
 
     function cancelRequest(requestId) {
@@ -376,6 +477,19 @@
         showPage(currentPage);
     });
 
+    document.addEventListener("DOMContentLoaded", function () {
+        let successBox = document.querySelector(".success-box");
+        let errorBox = document.querySelector(".error-box");
+
+        // ✅ Show only if content exists
+        if (successBox && successBox.textContent.trim() !== "") {
+            successBox.style.display = "block";
+        }
+
+        if (errorBox && errorBox.textContent.trim() !== "") {
+            errorBox.style.display = "block";
+        }
+    });
 </script>
 
 </body>

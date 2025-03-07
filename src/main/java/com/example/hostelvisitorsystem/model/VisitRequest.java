@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.security.SecureRandom;
 
 @Entity
 @Table(name = "visit_requests")
@@ -63,11 +63,22 @@ public class VisitRequest extends BaseEntity {
         PENDING, APPROVED, REJECTED, CANCELLED, REACHED
     }
 
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // Uppercase letters and numbers
+    private static final SecureRandom RANDOM = new SecureRandom();
+
     // Constructor
     public VisitRequest() {
-        this.verificationCode = UUID.randomUUID().toString().substring(0, 10).toUpperCase(); // Generate 10-character unique code
+        this.verificationCode = generateVerificationCode(); // Generate a secure 6-character alphanumeric code
         this.status = Status.PENDING; // Default status is pending
         this.requestDate = LocalDateTime.now();
+    }
+
+    private String generateVerificationCode() {
+        StringBuilder code = new StringBuilder(6);
+        for (int i = 0; i < 6; i++) {
+            code.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
+        }
+        return code.toString();
     }
 
     // Getters & Setters

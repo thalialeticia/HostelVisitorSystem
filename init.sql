@@ -108,7 +108,7 @@ VALUES
     ((SELECT id FROM users WHERE username='resident5'), 'REJECTED'),
     ((SELECT id FROM users WHERE username='resident6'), 'PENDING'),
     ((SELECT id FROM users WHERE username='resident7'), 'PENDING'),
-    ((SELECT id FROM users WHERE username='resident8'), 'PENDING');
+    ((SELECT id FROM users WHERE username='resident8'), 'APPROVED');
 
 -- Insert Security Staff (3 Users)
 INSERT INTO users (id, username, password, name, gender, phone, IC, email, role)
@@ -123,52 +123,63 @@ VALUES
     ((SELECT id FROM users WHERE username='security2'), 'MORNING'),
     ((SELECT id FROM users WHERE username='security3'), 'MORNING');
 
--- Insert sample visit requests (Fixed missing values)
+-- Insert sample visit requests (Fixed logic for REACHED status)
 INSERT INTO visit_requests (
     id, resident_id, security_staff_id, verification_code,
     visitor_name, visitor_phone, visitor_ic, visitor_email, visitor_address,
     visit_date, visit_time, purpose, status, managing_staff_id, approval_date, created_at, updated_at
 ) VALUES
-      (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security1'),
+      -- PENDING request (No security yet)
+      (UUID(), (SELECT id FROM users WHERE username='resident1'), NULL,
        'ABC123', 'John Doe', '0123456789', '111122223333', 'johndoe@example.com', '123 Main St, City',
        '2025-03-10', '14:00', 'Family Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
 
-      (UUID(), (SELECT id FROM users WHERE username='resident4'), (SELECT id FROM users WHERE username='security2'),
-       'DEF987', 'Charlie Johnson', '0156677889', '222233334444', 'charliej@example.com', '456 Elm St, Town',
-       '2025-03-15', '10:00', 'Friend Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
+      -- REACHED request (Security confirmed arrival)
+      (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security1'),
+       'XYZ999', 'Alice Green', '0192345678', '222211119999', 'alicegreen@example.com', '222 Avenue St, City',
+       '2025-03-05', '08:30', 'Business Meeting', 'REACHED',
+       (SELECT id FROM users WHERE username='manager1'), NOW(), NOW(), NOW()),
 
-      (UUID(), (SELECT id FROM users WHERE username='resident2'), (SELECT id FROM users WHERE username='security2'),
+      -- APPROVED request (No security yet)
+      (UUID(), (SELECT id FROM users WHERE username='resident2'), NULL,
        'XYZ789', 'Alice Brown', '0176543210', '333344445555', 'alicebrown@example.com', '789 Pine St, Village',
        '2025-03-08', '16:30', 'Business Meeting', 'APPROVED',
        (SELECT id FROM users WHERE username='manager1'), NOW(), NOW(), NOW()),
 
-      (UUID(), (SELECT id FROM users WHERE username='resident5'), (SELECT id FROM users WHERE username='security1'),
+      -- Client Meeting (APPROVED, No security yet)
+      (UUID(), (SELECT id FROM users WHERE username='resident5'), NULL,
        'GHI654', 'Emma Wilson', '0198877665', '444455556666', 'emmawilson@example.com', '321 Oak St, Metro',
        '2025-03-18', '18:00', 'Client Meeting', 'APPROVED',
        (SELECT id FROM users WHERE username='manager3'), NOW(), NOW(), NOW()),
 
-      (UUID(), (SELECT id FROM users WHERE username='resident3'), (SELECT id FROM users WHERE username='security1'),
+      -- Delivery (REJECTED, No security needed)
+      (UUID(), (SELECT id FROM users WHERE username='resident3'), NULL,
        'LMN456', 'Tom Smith', '0112233445', '555566667777', 'tomsmith@example.com', '654 Maple St, Valley',
        '2025-03-12', '11:00', 'Delivery', 'REJECTED',
        (SELECT id FROM users WHERE username='manager2'), NOW(), NOW(), NOW()),
 
-      (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security2'),
+      -- Work Meeting (PENDING, No security yet)
+      (UUID(), (SELECT id FROM users WHERE username='resident1'), NULL,
        'JKL321', 'Michael Scott', '0167894561', '666677778888', 'michaels@example.com', '987 Cedar St, Town',
        '2025-03-20', '15:00', 'Work Meeting', 'PENDING', NULL, NULL, NOW(), NOW()),
 
-      (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security1'),
+      -- Friend Visit (PENDING, No security yet)
+      (UUID(), (SELECT id FROM users WHERE username='resident1'), NULL,
        'OPQ678', 'Pam Beesly', '0171237896', '777788889999', 'pambeesly@example.com', '246 Birch St, City',
        '2025-03-22', '12:30', 'Friend Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
 
-      (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security1'),
-       'RST987', 'Jim Halpert', '0135678945', '888899990000', 'jimhalpert@example.com', '135 Aspen St, Town',
-       '2025-03-25', '09:30', 'Family Visit', 'CANCELLED', NULL, NULL, NOW(), NOW()),
-
+      -- Family Visit (REACHED, Security confirmed)
       (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security2'),
+       'RST987', 'Jim Halpert', '0135678945', '888899990000', 'jimhalpert@example.com', '135 Aspen St, Town',
+       '2025-03-25', '09:30', 'Family Visit', 'REACHED', NULL, NULL, NOW(), NOW()),
+
+      -- Friend Visit (PENDING, No security yet)
+      (UUID(), (SELECT id FROM users WHERE username='resident1'), NULL,
        'OPQ178', 'Kelly Lee', '0171237999', '999900001111', 'kellylee@example.com', '567 Walnut St, Metro',
        '2025-03-22', '11:30', 'Friend Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
 
+      -- Family Visit (REACHED, Security confirmed)
       (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security1'),
        'RST287', 'James Choo', '0135678941', '101112131415', 'jameschoo@example.com', '789 Cherry St, Valley',
-       '2025-03-25', '05:30', 'Family Visit', 'APPROVED',
+       '2025-03-25', '05:30', 'Family Visit', 'REACHED',
        (SELECT id FROM users WHERE username='manager2'), NOW(), NOW(), NOW());
