@@ -97,14 +97,15 @@
         }
 
         /* Buttons: Edit, Delete, Approve, Reject */
-        .action-buttons, .status-buttons {
+        .status-buttons {
             display: flex;
-            justify-content: center;
-            gap: 8px; /* Adds spacing between buttons */
+            justify-content: center; /* Ensure buttons are centered */
+            gap: 10px; /* Adjust spacing between Approve & Reject buttons */
         }
 
+
         /* General button styling */
-        .action-btn, .approve-btn, .reject-btn {
+        .action-btn {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -139,25 +140,39 @@
             transform: scale(1.05);
         }
 
-        /* Approve button */
+        .approve-btn, .reject-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px; /* Space between icon and text */
+            padding: 8px 16px; /* Ensure padding is the same */
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            text-decoration: none;
+        }
+
         .approve-btn {
-            background-color: #28a745; /* Green */
+            background-color: #28a745;
         }
 
         .approve-btn:hover {
-            background-color: #218838; /* Darker Green */
+            background-color: #218838;
             transform: scale(1.05);
         }
 
-        /* Reject button */
         .reject-btn {
-            background-color: #dc3545; /* Red */
+            background-color: #dc3545;
         }
 
         .reject-btn:hover {
-            background-color: #c82333; /* Darker Red */
+            background-color: #c82333;
             transform: scale(1.05);
         }
+
 
         /* Icons inside buttons */
         .action-btn i, .approve-btn i, .reject-btn i {
@@ -222,36 +237,84 @@
                 width: 100%;
             }
 
-            .action-buttons, .status-buttons {
-                flex-direction: column;
-                gap: 5px;
-            }
-
             table {
                 font-size: 12px;
             }
         }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center; /* Center align */
+            margin-top: 15px;
+        }
+
+        .pagination-btn {
+            background-color: #1e88e5; /* Active Blue */
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s ease, transform 0.2s ease;
+            margin-left: 10px;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background-color: #1565c0;
+            transform: scale(1.05);
+        }
+
+        /* Disabled button (Full Grey Effect) */
+        .pagination-btn:disabled {
+            background-color: #b0bec5 !important; /* Full Grey */
+            color: #ffffff !important;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
 
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Success Message (Hidden by Default) -->
-    <c:if test="${not empty success}">
-        <div class="success-box">
+    <!-- Success Message (Only if there is no error) -->
+    <c:if test="${not empty success and empty error}">
+        <div class="success-box" id="successMessage">
             <p>${success}</p>
         </div>
-        <c:remove var="success" scope="session"/>
     </c:if>
 
-    <!-- Error Message (Hidden by Default) -->
+    <!-- Error Message -->
     <c:if test="${not empty error}">
-        <div class="error-box">
+        <div class="error-box" id="errorMessage">
             <p>${error}</p>
         </div>
-        <c:remove var="error" scope="session"/>
     </c:if>
+
+    <!-- JavaScript to Hide Messages and Remove from Session After 3 Seconds -->
+    <script>
+        setTimeout(function () {
+            let successBox = document.getElementById('successMessage');
+            let errorBox = document.getElementById('errorMessage');
+
+            if (successBox) {
+                successBox.style.display = 'none';
+            }
+            if (errorBox) {
+                errorBox.style.display = 'none';
+            }
+
+            // Send AJAX request to clear session attributes
+            fetch('${pageContext.request.contextPath}/ClearMessagesServlet', { method: 'POST' })
+                .then(response => response.text())
+                .then(data => console.log('Session messages cleared:', data))
+                .catch(error => console.error('Error clearing session messages:', error));
+
+        }, 3000); // 3 seconds
+    </script>
 
     <h2>Manage Resident Accounts</h2>
 
@@ -321,6 +384,13 @@
 
 </div>
 
+<!-- Pagination Controls -->
+<div class="pagination-container">
+    <button id="prevBtn" class="pagination-btn" disabled>← Previous</button>
+    <button id="nextBtn" class="pagination-btn">Next →</button>
+</div>
+
+
 <!-- Buttons Below Container -->
 <div class="button-container">
     <a href="${pageContext.request.contextPath}/admin/dashboard" class="button back-btn">Back to Dashboard</a>
@@ -359,6 +429,48 @@
             window.location.href = "${pageContext.request.contextPath}/admin/manageResident?action=reject&id=" + id;
         }
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        let currentPage = 1;
+        const rowsPerPage = 7; // ✅ Set to 7 rows per page
+        const tableRows = document.querySelectorAll("#residentTable tr");
+        const totalPages = Math.ceil(tableRows.length / rowsPerPage) || 1; // Ensure at least 1 page
+
+        function updatePaginationButtons() {
+            const prevBtn = document.getElementById("prevBtn");
+            const nextBtn = document.getElementById("nextBtn");
+
+            prevBtn.disabled = (currentPage === 1);
+            nextBtn.disabled = (currentPage === totalPages);
+
+            prevBtn.style.backgroundColor = prevBtn.disabled ? "#b0bec5" : "#1e88e5"; // Grey when disabled, blue when active
+            nextBtn.style.backgroundColor = nextBtn.disabled ? "#b0bec5" : "#1e88e5";
+        }
+
+        function showPage(page) {
+            tableRows.forEach((row, index) => {
+                row.style.display = (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) ? "table-row" : "none";
+            });
+
+            currentPage = page;
+            updatePaginationButtons();
+        }
+
+        document.getElementById("prevBtn").addEventListener("click", function () {
+            if (currentPage > 1) {
+                showPage(currentPage - 1);
+            }
+        });
+
+        document.getElementById("nextBtn").addEventListener("click", function () {
+            if (currentPage < totalPages) {
+                showPage(currentPage + 1);
+            }
+        });
+
+        showPage(currentPage);
+    });
+
 
     document.addEventListener("DOMContentLoaded", function () {
         let successBox = document.querySelector(".success-box");

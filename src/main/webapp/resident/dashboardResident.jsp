@@ -250,7 +250,7 @@
 
     <!-- Request Visit Button -->
     <div class="dashboard-options">
-        <a href="requestVisit.jsp" class="button"><i class="fa-solid fa-calendar-check"></i> Request a Visit</a>
+        <a href="addRequestVisit.jsp" class="button"><i class="fa-solid fa-calendar-check"></i> Request a Visit</a>
     </div>
 
     <!-- Check & Update Status Table -->

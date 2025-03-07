@@ -31,6 +31,15 @@ public class VisitRequest extends BaseEntity {
     @Column(name = "visitor_phone", nullable = false)
     private String visitorPhone; // Contact number of the visitor
 
+    @Column(name = "visitor_ic", nullable = false, length = 12)
+    private String visitorIc; // IC Number (12-digit)
+
+    @Column(name = "visitor_email", nullable = false, length = 100)
+    private String visitorEmail; // Email of the visitor
+
+    @Column(name = "visitor_address", nullable = false, length = 255)
+    private String visitorAddress; // Address of the visitor
+
     @Column(name = "visit_date", nullable = false)
     private LocalDate visitDate; // Date of the visit
 
@@ -108,6 +117,30 @@ public class VisitRequest extends BaseEntity {
 
     public void setVisitorPhone(String visitorPhone) {
         this.visitorPhone = visitorPhone;
+    }
+
+    public String getVisitorIc() {
+        return visitorIc;
+    }
+
+    public void setVisitorIc(String visitorIc) {
+        this.visitorIc = visitorIc;
+    }
+
+    public String getVisitorEmail() {
+        return visitorEmail;
+    }
+
+    public void setVisitorEmail(String visitorEmail) {
+        this.visitorEmail = visitorEmail;
+    }
+
+    public String getVisitorAddress() {
+        return visitorAddress;
+    }
+
+    public void setVisitorAddress(String visitorAddress) {
+        this.visitorAddress = visitorAddress;
     }
 
     public LocalDate getVisitDate() {

@@ -75,10 +75,10 @@ public class EditProfileServlet extends HttpServlet {
 
         switch (loggedUser.getRole()) {
             case MANAGING_STAFF:
-                response.sendRedirect("admin/dashboardAdmin.jsp");
+                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
                 break;
             case RESIDENT:
-                response.sendRedirect("resident/dashboardResident.jsp");
+                response.sendRedirect(request.getContextPath() + "/resident/dashboardResident");
                 break;
             case SECURITY_STAFF:
                 response.sendRedirect("security/dashboardSecurity.jsp");

@@ -5,6 +5,7 @@ import com.example.hostelvisitorsystem.model.User;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.ejb.EJB;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,9 @@ public class UserFacade {
 
     @PersistenceContext(unitName = "hostelAPU")
     private EntityManager em;
+
+    @EJB
+    private VisitRequestFacade visitRequestFacade;
 
     public void create(User user) {
         em.persist(user);
@@ -123,8 +127,7 @@ public class UserFacade {
         counts.put("residents", residentCount);
 
         // Counting visitors
-        Long visitorCount = em.createQuery("SELECT COUNT(v) FROM Visitor v", Long.class)
-                .getSingleResult();
+        Long visitorCount = visitRequestFacade.getUniqueVisitorCount();
         counts.put("visitors", visitorCount);
 
         return counts;

@@ -219,6 +219,38 @@
             }
         }
 
+        .pagination-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        .pagination-btn {
+            background-color: #1e88e5; /* Active Blue */
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s ease, transform 0.2s ease;
+            margin-left: 10px;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background-color: #1565c0;
+            transform: scale(1.05);
+        }
+
+        /* Disabled button (Full Grey Effect) */
+        .pagination-btn:disabled {
+            background-color: #b0bec5 !important; /* Full Grey */
+            color: #ffffff !important;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
 
     </style>
 </head>
@@ -313,6 +345,13 @@
     </table>
 </div>
 
+<!-- Pagination Controls -->
+<div class="pagination-container">
+    <button id="prevBtn" class="pagination-btn" disabled>← Previous</button>
+    <button id="nextBtn" class="pagination-btn">Next →</button>
+</div>
+
+
 <!-- Buttons Below Container -->
 <div class="button-container">
     <a href="addStaff.jsp" class="button">Add New Staff</a>
@@ -340,6 +379,48 @@
             window.location.href = "${pageContext.request.contextPath}/admin/manageStaff?action=delete&id=" + id;
         }
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        let currentPage = 1;
+        const rowsPerPage = 7; // ✅ Set to 7 rows per page
+        const tableRows = document.querySelectorAll("#staffTable tr");
+        const totalPages = Math.ceil(tableRows.length / rowsPerPage) || 1; // Ensure at least 1 page
+
+        function updatePaginationButtons() {
+            const prevBtn = document.getElementById("prevBtn");
+            const nextBtn = document.getElementById("nextBtn");
+
+            prevBtn.disabled = (currentPage === 1);
+            nextBtn.disabled = (currentPage === totalPages);
+
+            prevBtn.style.backgroundColor = prevBtn.disabled ? "#b0bec5" : "#1e88e5"; // Grey when disabled, blue when active
+            nextBtn.style.backgroundColor = nextBtn.disabled ? "#b0bec5" : "#1e88e5";
+        }
+
+        function showPage(page) {
+            tableRows.forEach((row, index) => {
+                row.style.display = (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) ? "table-row" : "none";
+            });
+
+            currentPage = page;
+            updatePaginationButtons();
+        }
+
+        document.getElementById("prevBtn").addEventListener("click", function () {
+            if (currentPage > 1) {
+                showPage(currentPage - 1);
+            }
+        });
+
+        document.getElementById("nextBtn").addEventListener("click", function () {
+            if (currentPage < totalPages) {
+                showPage(currentPage + 1);
+            }
+        });
+
+        showPage(currentPage);
+    });
+
 
     document.addEventListener("DOMContentLoaded", function () {
         let successBox = document.querySelector(".success-box");

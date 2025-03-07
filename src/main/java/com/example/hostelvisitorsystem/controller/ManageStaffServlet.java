@@ -91,7 +91,7 @@ public class ManageStaffServlet extends HttpServlet {
         boolean newSuperAdmin = "on".equals(request.getParameter("superAdmin"));
 
         if (!isSuperAdmin && role.equals("MANAGING_STAFF")) {
-            request.getSession().setAttribute("error", "Only a super admin can create managing staff.");
+            request.setAttribute("error", "Only a super admin can create managing staff.");
             request.getRequestDispatcher("/admin/addStaff.jsp").forward(request, response);
             return;
         }
@@ -253,13 +253,13 @@ public class ManageStaffServlet extends HttpServlet {
         User staffToDelete = userFacade.find(id);
 
         if (staffToDelete instanceof ManagingStaff && ((ManagingStaff) staffToDelete).isSuperAdmin() && !isSuperAdmin) {
-            request.getSession().setAttribute("error", "You cannot delete a super admin.");
+            request.setAttribute("error", "You cannot delete a super admin.");
             response.sendRedirect("manageStaff");
             return;
         }
 
         userFacade.delete(id);
-        request.getSession().setAttribute("success", "Staff member deleted successfully.");
+        request.setAttribute("success", "Staff member deleted successfully.");
         response.sendRedirect("manageStaff");
     }
 

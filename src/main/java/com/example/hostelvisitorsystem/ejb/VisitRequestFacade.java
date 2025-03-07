@@ -60,4 +60,9 @@ public class VisitRequestFacade {
                 .getResultList();
     }
 
+    public Long getUniqueVisitorCount() {
+        return entityManager.createQuery(
+                        "SELECT COUNT(DISTINCT COALESCE(v.visitorIc, 'UNKNOWN')) FROM VisitRequest v", Long.class)
+                .getSingleResult();
+    }
 }

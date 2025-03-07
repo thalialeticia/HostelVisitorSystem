@@ -45,22 +45,25 @@ CREATE TABLE security_staff (
                                 FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Create Visit Requests Table
+-- Create Visit Requests Table (Added missing visitor fields)
 CREATE TABLE visit_requests (
-                                id CHAR(36) PRIMARY KEY, -- Using UUID format
-                                resident_id CHAR(36) NOT NULL, -- The resident who submitted the request
-                                security_staff_id CHAR(36), -- Security staff handling it
-                                verification_code VARCHAR(10) NOT NULL UNIQUE, -- Code for visitor check-in
-                                visitor_name VARCHAR(100) NOT NULL, -- Name of visitor
-                                visitor_phone VARCHAR(20) NOT NULL, -- Contact number of visitor
-                                visit_date DATE NOT NULL, -- Date of visit
-                                visit_time TIME NOT NULL, -- Time of visit
-                                purpose VARCHAR(255) NOT NULL, -- Reason for visit
-                                status ENUM('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'REACHED') DEFAULT 'PENDING', -- Request status
-                                managing_staff_id CHAR(36), -- Managing staff who approves or rejects
+                                id CHAR(36) PRIMARY KEY,
+                                resident_id CHAR(36) NOT NULL,
+                                security_staff_id CHAR(36),
+                                verification_code VARCHAR(10) NOT NULL UNIQUE,
+                                visitor_name VARCHAR(100) NOT NULL,
+                                visitor_phone VARCHAR(20) NOT NULL,
+                                visitor_ic VARCHAR(12) NOT NULL,
+                                visitor_email VARCHAR(100) NOT NULL,
+                                visitor_address VARCHAR(255) NOT NULL,
+                                visit_date DATE NOT NULL,
+                                visit_time TIME NOT NULL,
+                                purpose VARCHAR(255) NOT NULL,
+                                status ENUM('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'REACHED') DEFAULT 'PENDING',
+                                managing_staff_id CHAR(36),
                                 approval_date TIMESTAMP DEFAULT NULL,
-                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- When the request was created
-                                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Last update time
+                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                 FOREIGN KEY (resident_id) REFERENCES users(id) ON DELETE CASCADE,
                                 FOREIGN KEY (security_staff_id) REFERENCES users(id) ON DELETE SET NULL,
                                 FOREIGN KEY (managing_staff_id) REFERENCES users(id) ON DELETE SET NULL
@@ -83,14 +86,18 @@ VALUES
     ((SELECT id FROM users WHERE username='manager3'), 'IT Support', FALSE),
     ((SELECT id FROM users WHERE username='manager4'), 'Facilities', FALSE);
 
--- Insert Residents (10 Users)
+-- Insert Residents (8 Users)
 INSERT INTO users (id, username, password, name, gender, phone, IC, email, role)
 VALUES
     (UUID(), 'resident1', '$2a$12$s5xdIpoAjJv6jdNEAEDZhec0xFHGKhuCKgJBOuFBfaYnoRzdxNog6', 'Resident One', 'FEMALE', '0123456784', '623456789012', 'resident1@example.com', 'RESIDENT'),
     (UUID(), 'resident2', '$2a$12$rQ11IonzC4Hye3/oa11ove0X6aD/yU/rbTP9KBx335LKVvviXnA6K', 'Resident Two', 'MALE', '0123456783', '723456789012', 'resident2@example.com', 'RESIDENT'),
     (UUID(), 'resident3', '$2a$12$zTFN7nMwugoOFW7te48qdewiCpt1qVNo6.XbbJ0jay2WFIFyHHfrO', 'Resident Three', 'FEMALE', '0123456782', '823456789012', 'resident3@example.com', 'RESIDENT'),
     (UUID(), 'resident4', '$2a$12$dVOTAfhPVdOlgir6QPCNVOZHCl2kL/n9Gd8BvaEgsS8TWT2Y1VwuC', 'Resident Four', 'MALE', '0123456781', '923456789012', 'resident4@example.com', 'RESIDENT'),
-    (UUID(), 'resident5', '$2a$12$zkw2fRbMgHpEyUfWv9VmW.NcSQgusY9bSc.T7P6fQn7CxlM5t2LSy', 'Resident Five', 'FEMALE', '0123456780', '1023456789012', 'resident5@example.com', 'RESIDENT');
+    (UUID(), 'resident5', '$2a$12$zkw2fRbMgHpEyUfWv9VmW.NcSQgusY9bSc.T7P6fQn7CxlM5t2LSy', 'Resident Five', 'FEMALE', '0123456780', '1023456789012', 'resident5@example.com', 'RESIDENT'),
+    (UUID(), 'resident6', '$2a$12$6pyYWLWD2J7MnSauhvVf4uy35eCq6dMwCD8uwITvKF/jHps4PnRdi', 'Resident Six', 'MALE', '0123456700', '923456789023', 'resident6@example.com', 'RESIDENT'),
+    (UUID(), 'resident7', '$2a$12$YysE2vgPyO/D0t/V.kklcuPr/T3f4y0vWxE66cTmZS21U5BQX477u', 'Resident Seven', 'FEMALE', '0123453280', '1023456789010', 'resident7@example.com', 'RESIDENT'),
+    (UUID(), 'resident8', '$2a$12$.EQjeq0ZasIEO.yR/3P0O.d2nXKIIVgIZD3OExLbQkqJbcsWyw4IK', 'Resident Eight', 'FEMALE', '0123253280', '1023456712010', 'resident8@example.com', 'RESIDENT');
+
 
 INSERT INTO residents (id, status)
 VALUES
@@ -98,40 +105,70 @@ VALUES
     ((SELECT id FROM users WHERE username='resident2'), 'PENDING'),
     ((SELECT id FROM users WHERE username='resident3'), 'PENDING'),
     ((SELECT id FROM users WHERE username='resident4'), 'PENDING'),
-    ((SELECT id FROM users WHERE username='resident5'), 'REJECTED');
+    ((SELECT id FROM users WHERE username='resident5'), 'REJECTED'),
+    ((SELECT id FROM users WHERE username='resident6'), 'PENDING'),
+    ((SELECT id FROM users WHERE username='resident7'), 'PENDING'),
+    ((SELECT id FROM users WHERE username='resident8'), 'PENDING');
 
--- Insert Security Staff (10 Users)
+-- Insert Security Staff (3 Users)
 INSERT INTO users (id, username, password, name, gender, phone, IC, email, role)
 VALUES
     (UUID(), 'security1', '$2a$12$OT6g.gDBwVclQSp8K1oj8OxYnc1dnvwRBRG8/tFpp9Px9qC85VO/2', 'Security One', 'MALE', '0123456779', '2023456789012', 'security1@example.com', 'SECURITY_STAFF'),
-    (UUID(), 'security2', '$2a$12$0PHkm8mqFfTy/C41h60NrOImnxOaza5xg3ltOtQj4.W72guxTaJJe', 'Security Two', 'FEMALE', '0123456778', '3023456789012', 'security2@example.com', 'SECURITY_STAFF');
+    (UUID(), 'security2', '$2a$12$0PHkm8mqFfTy/C41h60NrOImnxOaza5xg3ltOtQj4.W72guxTaJJe', 'Security Two', 'FEMALE', '0123456778', '3023456789012', 'security2@example.com', 'SECURITY_STAFF'),
+    (UUID(), 'security3', '$2a$12$yTDCuRwrCEqyBG2YvC.H8uqbHbNfhIUw1/loYrKVf.srUh1C7byXS', 'Security Three', 'FEMALE', '0223456778', '3099456789012', 'security3@example.com', 'SECURITY_STAFF');
 
 INSERT INTO security_staff (id, shift)
 VALUES
     ((SELECT id FROM users WHERE username='security1'), 'NIGHT'),
-    ((SELECT id FROM users WHERE username='security2'), 'MORNING');
+    ((SELECT id FROM users WHERE username='security2'), 'MORNING'),
+    ((SELECT id FROM users WHERE username='security3'), 'MORNING');
 
--- Insert sample visit requests
+-- Insert sample visit requests (Fixed missing values)
 INSERT INTO visit_requests (
-    id, resident_id, security_staff_id, verification_code, visitor_name, visitor_phone,
+    id, resident_id, security_staff_id, verification_code,
+    visitor_name, visitor_phone, visitor_ic, visitor_email, visitor_address,
     visit_date, visit_time, purpose, status, managing_staff_id, approval_date, created_at, updated_at
 ) VALUES
       (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security1'),
-       'ABC123', 'John Doe', '0123456789', '2025-03-10', '14:00', 'Family Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
+       'ABC123', 'John Doe', '0123456789', '111122223333', 'johndoe@example.com', '123 Main St, City',
+       '2025-03-10', '14:00', 'Family Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
+
       (UUID(), (SELECT id FROM users WHERE username='resident4'), (SELECT id FROM users WHERE username='security2'),
-       'DEF987', 'Charlie Johnson', '0156677889', '2025-03-15', '10:00', 'Friend Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
+       'DEF987', 'Charlie Johnson', '0156677889', '222233334444', 'charliej@example.com', '456 Elm St, Town',
+       '2025-03-15', '10:00', 'Friend Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
+
       (UUID(), (SELECT id FROM users WHERE username='resident2'), (SELECT id FROM users WHERE username='security2'),
-       'XYZ789', 'Alice Brown', '0176543210', '2025-03-08', '16:30', 'Business Meeting', 'APPROVED',
+       'XYZ789', 'Alice Brown', '0176543210', '333344445555', 'alicebrown@example.com', '789 Pine St, Village',
+       '2025-03-08', '16:30', 'Business Meeting', 'APPROVED',
        (SELECT id FROM users WHERE username='manager1'), NOW(), NOW(), NOW()),
+
       (UUID(), (SELECT id FROM users WHERE username='resident5'), (SELECT id FROM users WHERE username='security1'),
-       'GHI654', 'Emma Wilson', '0198877665', '2025-03-18', '18:00', 'Client Meeting', 'APPROVED',
+       'GHI654', 'Emma Wilson', '0198877665', '444455556666', 'emmawilson@example.com', '321 Oak St, Metro',
+       '2025-03-18', '18:00', 'Client Meeting', 'APPROVED',
        (SELECT id FROM users WHERE username='manager3'), NOW(), NOW(), NOW()),
+
       (UUID(), (SELECT id FROM users WHERE username='resident3'), (SELECT id FROM users WHERE username='security1'),
-       'LMN456', 'Tom Smith', '0112233445', '2025-03-12', '11:00', 'Delivery', 'REJECTED',
+       'LMN456', 'Tom Smith', '0112233445', '555566667777', 'tomsmith@example.com', '654 Maple St, Valley',
+       '2025-03-12', '11:00', 'Delivery', 'REJECTED',
        (SELECT id FROM users WHERE username='manager2'), NOW(), NOW(), NOW()),
+
       (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security2'),
-    'JKL321', 'Michael Scott', '0167894561', '2025-03-20', '15:00', 'Work Meeting', 'PENDING', NULL, NULL, NOW(), NOW()),
-      (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security3'),
-    'OPQ678', 'Pam Beesly', '0171237896', '2025-03-22', '12:30', 'Friend Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
+       'JKL321', 'Michael Scott', '0167894561', '666677778888', 'michaels@example.com', '987 Cedar St, Town',
+       '2025-03-20', '15:00', 'Work Meeting', 'PENDING', NULL, NULL, NOW(), NOW()),
+
       (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security1'),
-    'RST987', 'Jim Halpert', '0135678945', '2025-03-25', '09:30', 'Family Visit', 'CANCELLED', NULL, NULL, NOW(), NOW());
+       'OPQ678', 'Pam Beesly', '0171237896', '777788889999', 'pambeesly@example.com', '246 Birch St, City',
+       '2025-03-22', '12:30', 'Friend Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
+
+      (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security1'),
+       'RST987', 'Jim Halpert', '0135678945', '888899990000', 'jimhalpert@example.com', '135 Aspen St, Town',
+       '2025-03-25', '09:30', 'Family Visit', 'CANCELLED', NULL, NULL, NOW(), NOW()),
+
+      (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security2'),
+       'OPQ178', 'Kelly Lee', '0171237999', '999900001111', 'kellylee@example.com', '567 Walnut St, Metro',
+       '2025-03-22', '11:30', 'Friend Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
+
+      (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security1'),
+       'RST287', 'James Choo', '0135678941', '101112131415', 'jameschoo@example.com', '789 Cherry St, Valley',
+       '2025-03-25', '05:30', 'Family Visit', 'APPROVED',
+       (SELECT id FROM users WHERE username='manager2'), NOW(), NOW(), NOW());
