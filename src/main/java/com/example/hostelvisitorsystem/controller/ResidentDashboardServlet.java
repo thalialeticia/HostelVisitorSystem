@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +31,62 @@ public class ResidentDashboardServlet extends HttpServlet {
             handleCancel(request, response);
         } else {
             populateResidentDashboardPage(request, response);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+
+        if ("createVisitRequest".equals(action)) {
+            handleCreateVisitRequest(request, response);
+        } else {
+            populateResidentDashboardPage(request, response);
+        }
+    }
+
+    private void handleCreateVisitRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        User loggedUser = (session != null) ? (User) session.getAttribute("loggedUser") : null;
+
+        if (loggedUser == null || !(loggedUser instanceof Resident)) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        try {
+            Resident resident = (Resident) loggedUser;
+            String visitorName = request.getParameter("visitorName");
+            String visitorPhone = request.getParameter("visitorPhone");
+            String visitorIc = request.getParameter("visitorIc");
+            String visitorEmail = request.getParameter("visitorEmail");
+            String visitorAddress = request.getParameter("visitorAddress");
+            LocalDate visitDate = LocalDate.parse(request.getParameter("visitDate"));
+            LocalTime visitTime = LocalTime.parse(request.getParameter("visitTime"));
+            String purpose = request.getParameter("purpose");
+
+            // Create a new visit request
+            VisitRequest visitRequest = new VisitRequest();
+            visitRequest.setResident(resident);
+            visitRequest.setVisitorName(visitorName);
+            visitRequest.setVisitorPhone(visitorPhone);
+            visitRequest.setVisitorIc(visitorIc);
+            visitRequest.setVisitorEmail(visitorEmail);
+            visitRequest.setVisitorAddress(visitorAddress);
+            visitRequest.setVisitDate(visitDate);
+            visitRequest.setVisitTime(visitTime);
+            visitRequest.setPurpose(purpose);
+            visitRequest.setStatus(VisitRequest.Status.PENDING);
+
+            // Persist the new visit request
+            visitRequestFacade.create(visitRequest);
+
+            session.setAttribute("success", "Visit request submitted successfully.");
+            response.sendRedirect(request.getContextPath() + "/resident/dashboardResident");
+
+        } catch (Exception e) {
+            session.setAttribute("error", "Error processing visit request. Please check your input.");
+            response.sendRedirect(request.getContextPath() + "/resident/requestVisit.jsp");
         }
     }
 

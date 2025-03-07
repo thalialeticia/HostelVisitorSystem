@@ -96,7 +96,7 @@
             gap: 8px; /* Ensure spacing between buttons */
         }
 
-        .status-buttons button {
+        .button {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -158,6 +158,11 @@
         .reject-btn:hover {
             background-color: #c82333;
             transform: scale(1.05);
+        }
+
+        /* Icons inside buttons */
+        .action-btn i, .approve-btn i, .reject-btn i {
+            font-size: 16px;
         }
 
         .button-container {

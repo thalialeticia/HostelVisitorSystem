@@ -96,13 +96,18 @@
             color: white;
         }
 
-        /* Buttons: Edit, Delete, Approve, Reject */
         .status-buttons {
             display: flex;
-            justify-content: center; /* Ensure buttons are centered */
-            gap: 10px; /* Adjust spacing between Approve & Reject buttons */
+            justify-content: center;
+            gap: 8px;
         }
 
+        /* Button styling */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px; /* Adds spacing between Edit & Delete buttons */
+        }
 
         /* General button styling */
         .action-btn {
@@ -139,6 +144,7 @@
             background-color: #c62828; /* Darker Red */
             transform: scale(1.05);
         }
+
 
         .approve-btn, .reject-btn {
             display: flex;

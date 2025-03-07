@@ -209,11 +209,6 @@
                 width: 100%;
             }
 
-            .action-buttons {
-                flex-direction: column;
-                gap: 5px;
-            }
-
             table {
                 font-size: 12px;
             }
