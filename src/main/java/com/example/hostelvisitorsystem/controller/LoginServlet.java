@@ -61,7 +61,7 @@ public class LoginServlet extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/admin/dashboard");
                     break;
                 case RESIDENT:
-                    response.sendRedirect("resident/dashboardResident.jsp");
+                    response.sendRedirect(request.getContextPath() + "/resident/dashboardResident");
                     break;
                 case SECURITY_STAFF:
                     response.sendRedirect("security/dashboardSecurity.jsp");
