@@ -11,7 +11,7 @@ public class ManagingStaff extends User {
     @Column(nullable = false)
     private String department;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name="is_super_admin")
     private boolean isSuperAdmin = false; // Default false
 
     public ManagingStaff() {

@@ -1,11 +1,10 @@
 package com.example.hostelvisitorsystem.ejb;
 
-import com.example.hostelvisitorsystem.model.Resident;
+
 import com.example.hostelvisitorsystem.model.User;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
 
 import java.util.HashMap;
 import java.util.List;

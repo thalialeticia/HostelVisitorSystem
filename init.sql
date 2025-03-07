@@ -34,7 +34,7 @@ CREATE TABLE residents (
 CREATE TABLE managing_staff (
                                 id CHAR(36) PRIMARY KEY,
                                 department VARCHAR(100) NOT NULL DEFAULT 'General Administration',
-                                isSuperAdmin BOOLEAN NOT NULL DEFAULT FALSE,
+                                is_super_admin BOOLEAN NOT NULL DEFAULT FALSE,
                                 FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -48,14 +48,22 @@ CREATE TABLE security_staff (
 -- Create Visit Requests Table
 CREATE TABLE visit_requests (
                                 id CHAR(36) PRIMARY KEY, -- Using UUID format
-                                resident_id CHAR(36) NOT NULL,
-                                security_staff_id CHAR(36),
-                                verification_code VARCHAR(10) NOT NULL UNIQUE,
-                                status ENUM('SUBMITTED', 'CANCELLED', 'CLOSED') DEFAULT 'SUBMITTED',
-                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                resident_id CHAR(36) NOT NULL, -- The resident who submitted the request
+                                security_staff_id CHAR(36), -- Security staff handling it
+                                verification_code VARCHAR(10) NOT NULL UNIQUE, -- Code for visitor check-in
+                                visitor_name VARCHAR(100) NOT NULL, -- Name of visitor
+                                visitor_phone VARCHAR(20) NOT NULL, -- Contact number of visitor
+                                visit_date DATE NOT NULL, -- Date of visit
+                                visit_time TIME NOT NULL, -- Time of visit
+                                purpose VARCHAR(255) NOT NULL, -- Reason for visit
+                                status ENUM('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'REACHED') DEFAULT 'PENDING', -- Request status
+                                managing_staff_id CHAR(36), -- Managing staff who approves or rejects
+                                approval_date TIMESTAMP DEFAULT NULL,
+                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- When the request was created
+                                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Last update time
                                 FOREIGN KEY (resident_id) REFERENCES users(id) ON DELETE CASCADE,
-                                FOREIGN KEY (security_staff_id) REFERENCES users(id) ON DELETE SET NULL
+                                FOREIGN KEY (security_staff_id) REFERENCES users(id) ON DELETE SET NULL,
+                                FOREIGN KEY (managing_staff_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- Insert Managing Staff (Including 1 Super Admin)
@@ -67,7 +75,7 @@ VALUES
     (UUID(), 'manager3', '$2a$12$Croqw060DYRsBTOXP89hgukRQHX8bDeeMikO4Hrg7vbJ0BAi6ha.6', 'Manager Three', 'MALE', '0123456786', '423456789012', 'manager3@example.com', 'MANAGING_STAFF'),
     (UUID(), 'manager4', '$2a$12$6mGfQSDtLg3E.P335ozcZev3xpOfHRA1g8UlyeXBueEkN3NRmrZvC', 'Manager Four', 'FEMALE', '0123456785', '523456789012', 'manager4@example.com', 'MANAGING_STAFF');
 
-INSERT INTO managing_staff (id, department, isSuperAdmin)
+INSERT INTO managing_staff (id, department, is_super_admin)
 VALUES
     ((SELECT id FROM users WHERE username='admin'), 'Human Resources', TRUE),
     ((SELECT id FROM users WHERE username='manager1'), 'Finance', FALSE),
@@ -102,3 +110,28 @@ INSERT INTO security_staff (id, shift)
 VALUES
     ((SELECT id FROM users WHERE username='security1'), 'NIGHT'),
     ((SELECT id FROM users WHERE username='security2'), 'MORNING');
+
+-- Insert sample visit requests
+INSERT INTO visit_requests (
+    id, resident_id, security_staff_id, verification_code, visitor_name, visitor_phone,
+    visit_date, visit_time, purpose, status, managing_staff_id, approval_date, created_at, updated_at
+) VALUES
+      (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security1'),
+       'ABC123', 'John Doe', '0123456789', '2025-03-10', '14:00', 'Family Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
+      (UUID(), (SELECT id FROM users WHERE username='resident4'), (SELECT id FROM users WHERE username='security2'),
+       'DEF987', 'Charlie Johnson', '0156677889', '2025-03-15', '10:00', 'Friend Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
+      (UUID(), (SELECT id FROM users WHERE username='resident2'), (SELECT id FROM users WHERE username='security2'),
+       'XYZ789', 'Alice Brown', '0176543210', '2025-03-08', '16:30', 'Business Meeting', 'APPROVED',
+       (SELECT id FROM users WHERE username='manager1'), NOW(), NOW(), NOW()),
+      (UUID(), (SELECT id FROM users WHERE username='resident5'), (SELECT id FROM users WHERE username='security1'),
+       'GHI654', 'Emma Wilson', '0198877665', '2025-03-18', '18:00', 'Client Meeting', 'APPROVED',
+       (SELECT id FROM users WHERE username='manager3'), NOW(), NOW(), NOW()),
+      (UUID(), (SELECT id FROM users WHERE username='resident3'), (SELECT id FROM users WHERE username='security1'),
+       'LMN456', 'Tom Smith', '0112233445', '2025-03-12', '11:00', 'Delivery', 'REJECTED',
+       (SELECT id FROM users WHERE username='manager2'), NOW(), NOW(), NOW()),
+      (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security2'),
+    'JKL321', 'Michael Scott', '0167894561', '2025-03-20', '15:00', 'Work Meeting', 'PENDING', NULL, NULL, NOW(), NOW()),
+      (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security3'),
+    'OPQ678', 'Pam Beesly', '0171237896', '2025-03-22', '12:30', 'Friend Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
+      (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security1'),
+    'RST987', 'Jim Halpert', '0135678945', '2025-03-25', '09:30', 'Family Visit', 'CANCELLED', NULL, NULL, NOW(), NOW());

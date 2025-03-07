@@ -284,9 +284,14 @@
             <td>
                 <% if (res.getStatus() == Resident.Status.PENDING) { %>
                 <div class="status-buttons">
-                    <button class="approve-btn" onclick="approveResident('<%= res.getId() %>')">Approve</button>
-                    <button class="reject-btn" onclick="rejectResident('<%= res.getId() %>')">Reject</button>
+                    <button class="approve-btn" onclick="approveResident('<%= res.getId() %>')">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                    <button class="reject-btn" onclick="rejectResident('<%= res.getId() %>')">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
                 </div>
+
                 <% } else { %>
                 <%= res.getStatus() %>
                 <% } %>
