@@ -189,5 +189,4 @@ public class ResidentDashboardServlet extends HttpServlet {
         request.setAttribute("visitRequest", visitRequest);
         request.getRequestDispatcher("/resident/viewRequestVisit.jsp").forward(request, response);
     }
-
 }

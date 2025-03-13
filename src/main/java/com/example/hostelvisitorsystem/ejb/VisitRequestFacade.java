@@ -4,6 +4,9 @@ import com.example.hostelvisitorsystem.model.VisitRequest;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Stateless
@@ -62,7 +65,37 @@ public class VisitRequestFacade {
 
     public Long getUniqueVisitorCount() {
         return entityManager.createQuery(
-                        "SELECT COUNT(DISTINCT COALESCE(v.visitorIc, 'UNKNOWN')) FROM VisitRequest v", Long.class)
+                        "SELECT COUNT(DISTINCT v.visitorIc) FROM VisitRequest v WHERE v.visitorIc IS NOT NULL", Long.class)
                 .getSingleResult();
     }
+
+
+    /**
+     * Find visit request by verification code where status is APPROVED.
+     */
+    public VisitRequest findActiveByVerificationCodeAndIC(String code, String visitorIc) {
+        TypedQuery<VisitRequest> query = entityManager.createQuery(
+                "SELECT v FROM VisitRequest v WHERE v.verificationCode = :code AND v.visitorIc = :visitorIc " +
+                        "AND v.status = :status AND (v.expiredAt IS NULL OR v.expiredAt > :now)", VisitRequest.class);
+
+        query.setParameter("code", code);
+        query.setParameter("visitorIc", visitorIc);
+        query.setParameter("status", VisitRequest.Status.APPROVED);
+        query.setParameter("now", LocalDateTime.now()); // Current timestamp
+
+        List<VisitRequest> results = query.getResultList();
+        return results.isEmpty() ? null : results.get(0);
+    }
+
+    public boolean existsByVerificationCode(String code) {
+        TypedQuery<Long> query = entityManager.createQuery(
+                "SELECT COUNT(v) FROM VisitRequest v WHERE v.verificationCode = :code AND (v.expiredAt IS NULL OR v.expiredAt > :now)",
+                Long.class);
+
+        query.setParameter("code", code);
+        query.setParameter("now", LocalDateTime.now());
+
+        return query.getSingleResult() > 0;
+    }
+
 }

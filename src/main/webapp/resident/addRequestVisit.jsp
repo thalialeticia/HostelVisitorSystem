@@ -170,7 +170,7 @@
 
         <div class="form-group input-with-icon">
             <label>Visitor Name</label>
-            <input type="text" name="visitorName" placeholder="John Doe" required>
+            <input type="text" name="visitorName" placeholder="Full Name" required>
         </div>
 
         <div class="form-group">

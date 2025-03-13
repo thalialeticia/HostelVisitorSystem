@@ -344,7 +344,7 @@
 
     <!-- Search Bar -->
     <div class="search-container">
-        <input type="text" id="searchInput" placeholder="🔍 Search by Name or Status..." onkeyup="searchRequest()">
+        <input type="text" id="searchInput" placeholder="Search by Name or Status..." onkeyup="searchRequest()">
         <i class="fa-solid fa-search search-icon"></i>
     </div>
 

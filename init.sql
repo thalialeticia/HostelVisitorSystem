@@ -50,7 +50,8 @@ CREATE TABLE visit_requests (
                                 id CHAR(36) PRIMARY KEY,
                                 resident_id CHAR(36) NOT NULL,
                                 security_staff_id CHAR(36),
-                                verification_code VARCHAR(10) NOT NULL UNIQUE,
+                                verification_code VARCHAR(10),
+                                verification_code_count INT DEFAULT 0,
                                 visitor_name VARCHAR(100) NOT NULL,
                                 visitor_phone VARCHAR(20) NOT NULL,
                                 visitor_ic VARCHAR(12) NOT NULL,
@@ -58,8 +59,11 @@ CREATE TABLE visit_requests (
                                 visitor_address VARCHAR(255) NOT NULL,
                                 visit_date DATE NOT NULL,
                                 visit_time TIME NOT NULL,
+                                check_in_time TIMESTAMP DEFAULT NULL,  -- Stores actual check-in time
+                                check_out_time TIMESTAMP DEFAULT NULL, -- Stores actual check-out time
+                                expired_at TIMESTAMP DEFAULT NULL,
                                 purpose VARCHAR(255) NOT NULL,
-                                status ENUM('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'REACHED') DEFAULT 'PENDING',
+                                status ENUM('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'REACHED', 'CHECKED_OUT') DEFAULT 'PENDING',
                                 managing_staff_id CHAR(36),
                                 approval_date TIMESTAMP DEFAULT NULL,
                                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -127,59 +131,61 @@ VALUES
 INSERT INTO visit_requests (
     id, resident_id, security_staff_id, verification_code,
     visitor_name, visitor_phone, visitor_ic, visitor_email, visitor_address,
-    visit_date, visit_time, purpose, status, managing_staff_id, approval_date, created_at, updated_at
+    visit_date, visit_time, purpose, status, managing_staff_id, approval_date, created_at, updated_at, check_in_time, check_out_time, expired_at
 ) VALUES
-      -- PENDING request (No security yet)
+      -- APPROVED request (No security yet) EXPIRED
       (UUID(), (SELECT id FROM users WHERE username='resident1'), NULL,
        'ABC123', 'John Doe', '0123456789', '111122223333', 'johndoe@example.com', '123 Main St, City',
-       '2025-03-10', '14:00', 'Family Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
+       DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')) - INTERVAL 1 DAY
+          , TIME(NOW() - INTERVAL 1 DAY), 'Family Visit', 'APPROVED', NULL, NULL, DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), NULL, NULL,
+       TIMESTAMP(CONVERT_TZ(CURDATE(), '+00:00', '+08:00'), '23:59:59')),
 
       -- REACHED request (Security confirmed arrival)
       (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security1'),
        'XYZ999', 'Alice Green', '0192345678', '222211119999', 'alicegreen@example.com', '222 Avenue St, City',
-       '2025-03-05', '08:30', 'Business Meeting', 'REACHED',
-       (SELECT id FROM users WHERE username='manager1'), NOW(), NOW(), NOW()),
+       DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), TIME(NOW() - INTERVAL 20 MINUTE), 'Business Meeting', 'REACHED',
+       (SELECT id FROM users WHERE username='manager1'), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), NULL, TIMESTAMP(CONVERT_TZ(CURDATE(), '+00:00', '+08:00'), '23:59:59')),
 
       -- APPROVED request (No security yet)
       (UUID(), (SELECT id FROM users WHERE username='resident2'), NULL,
        'XYZ789', 'Alice Brown', '0176543210', '333344445555', 'alicebrown@example.com', '789 Pine St, Village',
-       '2025-03-08', '16:30', 'Business Meeting', 'APPROVED',
-       (SELECT id FROM users WHERE username='manager1'), NOW(), NOW(), NOW()),
+       DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), TIME(NOW() + INTERVAL 20 MINUTE), 'Business Meeting', 'APPROVED',
+       (SELECT id FROM users WHERE username='manager1'), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), NULL, NULL, TIMESTAMP(CONVERT_TZ(CURDATE(), '+00:00', '+08:00'), '23:59:59')),
 
       -- Client Meeting (APPROVED, No security yet)
       (UUID(), (SELECT id FROM users WHERE username='resident5'), NULL,
        'GHI654', 'Emma Wilson', '0198877665', '444455556666', 'emmawilson@example.com', '321 Oak St, Metro',
-       '2025-03-18', '18:00', 'Client Meeting', 'APPROVED',
-       (SELECT id FROM users WHERE username='manager3'), NOW(), NOW(), NOW()),
+       DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), TIME(NOW() - INTERVAL 20 MINUTE), 'Client Meeting', 'APPROVED',
+       (SELECT id FROM users WHERE username='manager3'), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), NULL, NULL, TIMESTAMP(CONVERT_TZ(CURDATE(), '+00:00', '+08:00'), '23:59:59')),
 
       -- Delivery (REJECTED, No security needed)
       (UUID(), (SELECT id FROM users WHERE username='resident3'), NULL,
-       'LMN456', 'Tom Smith', '0112233445', '555566667777', 'tomsmith@example.com', '654 Maple St, Valley',
+       NULL, 'Tom Smith', '0112233445', '555566667777', 'tomsmith@example.com', '654 Maple St, Valley',
        '2025-03-12', '11:00', 'Delivery', 'REJECTED',
-       (SELECT id FROM users WHERE username='manager2'), NOW(), NOW(), NOW()),
+       (SELECT id FROM users WHERE username='manager2'), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), NULL, NULL, NULL),
 
       -- Work Meeting (PENDING, No security yet)
       (UUID(), (SELECT id FROM users WHERE username='resident1'), NULL,
-       'JKL321', 'Michael Scott', '0167894561', '666677778888', 'michaels@example.com', '987 Cedar St, Town',
-       '2025-03-20', '15:00', 'Work Meeting', 'PENDING', NULL, NULL, NOW(), NOW()),
+       NULL, 'Michael Scott', '0167894561', '666677778888', 'michaels@example.com', '987 Cedar St, Town',
+       DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), TIME(NOW() - INTERVAL 20 MINUTE), 'Work Meeting', 'PENDING', NULL, NULL, DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), NULL, NULL, NULL),
 
       -- Friend Visit (PENDING, No security yet)
       (UUID(), (SELECT id FROM users WHERE username='resident1'), NULL,
-       'OPQ678', 'Pam Beesly', '0171237896', '777788889999', 'pambeesly@example.com', '246 Birch St, City',
-       '2025-03-22', '12:30', 'Friend Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
+       NULL, 'Pam Beesly', '0171237896', '777788889999', 'pambeesly@example.com', '246 Birch St, City',
+       DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), TIME(NOW() + INTERVAL 55 MINUTE), 'Friend Visit', 'PENDING', NULL, NULL, DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), NULL, NULL, NULL),
 
       -- Family Visit (REACHED, Security confirmed)
       (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security2'),
        'RST987', 'Jim Halpert', '0135678945', '888899990000', 'jimhalpert@example.com', '135 Aspen St, Town',
-       '2025-03-25', '09:30', 'Family Visit', 'REACHED', NULL, NULL, NOW(), NOW()),
+       DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), TIME(NOW() - INTERVAL 25 MINUTE), 'Family Visit', 'REACHED', NULL, NULL, DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), NULL, TIMESTAMP(CONVERT_TZ(CURDATE(), '+00:00', '+08:00'), '23:59:59')),
 
       -- Friend Visit (PENDING, No security yet)
       (UUID(), (SELECT id FROM users WHERE username='resident1'), NULL,
-       'OPQ178', 'Kelly Lee', '0171237999', '999900001111', 'kellylee@example.com', '567 Walnut St, Metro',
-       '2025-03-22', '11:30', 'Friend Visit', 'PENDING', NULL, NULL, NOW(), NOW()),
+       '', 'Kelly Lee', '0171237999', '999900001111', 'kellylee@example.com', '567 Walnut St, Metro',
+       DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), TIME(NOW() + INTERVAL 45 MINUTE), 'Friend Visit', 'PENDING', NULL, NULL, DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), NULL, NULL, NULL),
 
       -- Family Visit (REACHED, Security confirmed)
       (UUID(), (SELECT id FROM users WHERE username='resident1'), (SELECT id FROM users WHERE username='security1'),
        'RST287', 'James Choo', '0135678941', '101112131415', 'jameschoo@example.com', '789 Cherry St, Valley',
-       '2025-03-25', '05:30', 'Family Visit', 'REACHED',
-       (SELECT id FROM users WHERE username='manager2'), NOW(), NOW(), NOW());
+       DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), TIME(NOW() - INTERVAL 15 MINUTE), 'Family Visit', 'REACHED',
+       (SELECT id FROM users WHERE username='manager2'), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00')), now(), NULL, TIMESTAMP(CONVERT_TZ(CURDATE(), '+00:00', '+08:00'), '23:59:59'));

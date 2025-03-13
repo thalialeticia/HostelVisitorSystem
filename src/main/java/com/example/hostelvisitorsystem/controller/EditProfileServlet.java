@@ -81,7 +81,7 @@ public class EditProfileServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/resident/dashboardResident");
                 break;
             case SECURITY_STAFF:
-                response.sendRedirect("security/dashboardSecurity.jsp");
+                response.sendRedirect(request.getContextPath() + "/security/dashboardSecurity");
                 break;
             default:
                 response.sendRedirect("login.jsp?error=UnknownRole");

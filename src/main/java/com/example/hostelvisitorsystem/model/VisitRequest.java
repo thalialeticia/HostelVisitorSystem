@@ -22,8 +22,11 @@ public class VisitRequest extends BaseEntity {
     @JoinColumn(name = "managing_staff_id")
     private ManagingStaff managingStaff; // The managing staff approving/rejecting the request
 
-    @Column(name = "verification_code", nullable = false, unique = true)
+    @Column(name = "verification_code")
     private String verificationCode; // Code for visitor check-in
+
+    @Column(name = "verification_code_count")
+    private int verificationCodeCount;
 
     @Column(name = "visitor_name", nullable = false)
     private String visitorName; // Name of the visitor
@@ -46,6 +49,15 @@ public class VisitRequest extends BaseEntity {
     @Column(name = "visit_time", nullable = false)
     private LocalTime visitTime; // Time of the visit
 
+    @Column(name = "check_in_time")
+    private LocalDateTime checkInTime; // Timestamp for visitor check-in
+
+    @Column(name = "check_out_time")
+    private LocalDateTime checkOutTime; // Timestamp for visitor check-out
+
+    @Column(name = "expired_at")
+    private LocalDateTime expiredAt; // Timestamp for code expiration date
+
     @Column(name = "purpose", nullable = false, length = 255)
     private String purpose; // Purpose of visit
 
@@ -60,7 +72,7 @@ public class VisitRequest extends BaseEntity {
     private LocalDateTime approvalDate; // Only set when approved
 
     public enum Status {
-        PENDING, APPROVED, REJECTED, CANCELLED, REACHED
+        PENDING, APPROVED, REJECTED, CANCELLED, REACHED, CHECKED_OUT
     }
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // Uppercase letters and numbers
@@ -68,17 +80,9 @@ public class VisitRequest extends BaseEntity {
 
     // Constructor
     public VisitRequest() {
-        this.verificationCode = generateVerificationCode(); // Generate a secure 6-character alphanumeric code
         this.status = Status.PENDING; // Default status is pending
         this.requestDate = LocalDateTime.now();
-    }
-
-    private String generateVerificationCode() {
-        StringBuilder code = new StringBuilder(6);
-        for (int i = 0; i < 6; i++) {
-            code.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
-        }
-        return code.toString();
+        this.verificationCodeCount = 0;
     }
 
     // Getters & Setters
@@ -112,6 +116,14 @@ public class VisitRequest extends BaseEntity {
 
     public void setVerificationCode(String verificationCode) {
         this.verificationCode = verificationCode;
+    }
+
+    public int getVerificationCodeCount() {
+        return verificationCodeCount;
+    }
+
+    public void setVerificationCodeCount(int verificationCodeCount) {
+        this.verificationCodeCount = verificationCodeCount;
     }
 
     public String getVisitorName() {
@@ -169,6 +181,31 @@ public class VisitRequest extends BaseEntity {
     public void setVisitTime(LocalTime visitTime) {
         this.visitTime = visitTime;
     }
+
+    public LocalDateTime getCheckInTime() {
+        return checkInTime;
+    }
+
+    public void setCheckInTime(LocalDateTime checkInTime) {
+        this.checkInTime = checkInTime;
+    }
+
+    public LocalDateTime getCheckOutTime() {
+        return checkOutTime;
+    }
+
+    public void setCheckOutTime(LocalDateTime checkOutTime) {
+        this.checkOutTime = checkOutTime;
+    }
+
+    public LocalDateTime getExpiredAt() {
+        return expiredAt;
+    }
+
+    public void setExpiredAt(LocalDateTime expiredAt) {
+        this.expiredAt = expiredAt;
+    }
+
 
     public String getPurpose() {
         return purpose;

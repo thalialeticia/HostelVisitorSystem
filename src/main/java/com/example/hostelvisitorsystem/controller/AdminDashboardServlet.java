@@ -18,34 +18,42 @@ public class AdminDashboardServlet extends HttpServlet {
     private UserFacade userFacade;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        User loggedUser = (session != null) ? (User) session.getAttribute("loggedUser") : null;
+        String action = request.getParameter("action");
 
-        if (loggedUser == null || !loggedUser.getRole().toString().equals("MANAGING_STAFF")) {
-            switch (loggedUser.getRole()) {
-                case MANAGING_STAFF:
-                    response.sendRedirect(request.getContextPath() + "/admin/dashboard");
-                    break;
-                case RESIDENT:
-                    response.sendRedirect(request.getContextPath() + "/resident/dashboardResident");
-                    break;
-                case SECURITY_STAFF:
-                    response.sendRedirect("security/dashboardSecurity.jsp");
-                    break;
-                default:
-                    response.sendRedirect(request.getContextPath() + "/login.jsp");
+        if ("view-report".equals(action)) {
+            System.out.println("Generating Reports...");
+
+            Map<String, Object> reports = userFacade.getAllReports();
+
+            // ✅ Store reports in request attributes
+            request.setAttribute("genderReport", reports.get("genderReport"));
+            request.setAttribute("purposeReport", reports.get("purposeReport"));
+            request.setAttribute("ageReport", reports.get("ageReport"));
+            request.setAttribute("checkInTrends", reports.get("checkInTrends"));
+            request.setAttribute("locationReport", reports.get("locationReport"));
+            request.setAttribute("visitDurationReport", reports.get("visitDurationReport"));
+
+            // ✅ Forward to JSP
+            request.getRequestDispatcher("/admin/viewReport.jsp").forward(request, response);
+        } else {
+            HttpSession session = request.getSession(false);
+            User loggedUser = (session != null) ? (User) session.getAttribute("loggedUser") : null;
+
+            if (loggedUser == null || !loggedUser.getRole().toString().equals("MANAGING_STAFF")) {
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
+                return;
             }
+
+            // Fetch analytics data from UserFacade
+            Map<String, Long> analyticsData = userFacade.countAnalytics();
+
+            // Store analytics data in request attributes
+            request.setAttribute("totalStaff", analyticsData.get("staff"));
+            request.setAttribute("totalResidents", analyticsData.get("residents"));
+            request.setAttribute("totalVisitors", analyticsData.get("visitors"));
+
+            // ✅ Fix: Forward to the correct JSP file
+            request.getRequestDispatcher("/admin/dashboardAdmin.jsp").forward(request, response);
         }
-
-        // Fetch analytics data from UserFacade
-        Map<String, Long> analyticsData = userFacade.countAnalytics();
-
-        // Store analytics data in request attributes
-        request.setAttribute("totalStaff", analyticsData.get("staff"));
-        request.setAttribute("totalResidents", analyticsData.get("residents"));
-        request.setAttribute("totalVisitors", analyticsData.get("visitors"));
-
-        // ✅ Fix: Forward to the correct JSP file
-        request.getRequestDispatcher("/admin/dashboardAdmin.jsp").forward(request, response);
     }
 }

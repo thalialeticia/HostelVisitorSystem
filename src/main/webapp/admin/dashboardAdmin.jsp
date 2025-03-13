@@ -186,8 +186,8 @@
     <a href="${pageContext.request.contextPath}/admin/manageVisitRequests" class="button">
         <i class="fas fa-user-cog"></i> Manage Visitors
     </a>
-    <a href="viewReports.jsp" class="button">
-        <i class="fas fa-chart-line"></i> View Reports
+    <a href="${pageContext.request.contextPath}/admin/dashboard?action=view-report" class="button">
+        <i class="fas fa-chart-bar"></i> View Reports
     </a>
 
     <!-- Logout Button -->

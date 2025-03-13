@@ -125,6 +125,61 @@
             background-color: #1565c0;
             transform: scale(1.05);
         }
+
+        /* Check-in and Check-out Time Container */
+        .check-time-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            align-items: center;
+        }
+
+        /* Each Check-in/Check-out Item */
+        .check-time-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        /* Label, Date, and Time Formatting */
+        .check-time-details {
+            display: flex;
+            flex-direction: column; /* Makes the date appear above the time */
+            font-size: 14px;
+        }
+
+        .check-time-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .check-time-date {
+            font-size: 16px;
+            font-weight: bold;
+            color: #222;
+        }
+
+        .check-time-clock {
+            font-size: 14px;
+            color: #444;
+        }
+
+        /* Icons */
+        .check-in-icon {
+            color: #28a745; /* Green for Check-in */
+            font-size: 18px;
+        }
+
+        .check-out-icon {
+            color: #dc3545; /* Red for Check-out */
+            font-size: 18px;
+        }
     </style>
 </head>
 
@@ -142,6 +197,34 @@
         <div class="info-item"><i class="fa-solid fa-calendar"></i> <span>Visit Date: </span>&nbsp; <%= visitRequest.getVisitDate().format(dateFormatter) %></div>
         <div class="info-item"><i class="fa-solid fa-clock"></i> <span>Visit Time: </span>&nbsp; <%= visitRequest.getVisitTime().format(timeFormatter) %></div>
         <div class="info-item"><i class="fa-solid fa-clipboard-list"></i> <span>Purpose: </span>&nbsp; <%= visitRequest.getPurpose() %></div>
+
+        <!-- Check-in & Check-out Time Section -->
+        <div class="check-time-container" style="margin-bottom: 10px">
+            <div class="check-time-item">
+                <i class="fa-solid fa-sign-in-alt check-in-icon"></i>
+                <div class="check-time-details">
+                    <span class="check-time-label">Check-in Time:</span>
+                    <span class="check-time-date">
+                <%= (visitRequest.getCheckInTime() != null) ? visitRequest.getCheckInTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "-" %>
+            </span>
+                    <span class="check-time-clock">
+                <%= (visitRequest.getCheckInTime() != null) ? visitRequest.getCheckInTime().format(DateTimeFormatter.ofPattern("hh:mm a")) : "" %>
+            </span>
+                </div>
+            </div>
+            <div class="check-time-item">
+                <i class="fa-solid fa-sign-out-alt check-out-icon"></i>
+                <div class="check-time-details">
+                    <span class="check-time-label">Check-out Time:</span>
+                    <span class="check-time-date">
+                <%= (visitRequest.getCheckOutTime() != null) ? visitRequest.getCheckOutTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "-" %>
+            </span>
+                    <span class="check-time-clock">
+                <%= (visitRequest.getCheckOutTime() != null) ? visitRequest.getCheckOutTime().format(DateTimeFormatter.ofPattern("hh:mm a")) : "" %>
+            </span>
+                </div>
+            </div>
+        </div>
 
         <!-- Status (Plain Text Without Color) -->
         <div class="info-item">
