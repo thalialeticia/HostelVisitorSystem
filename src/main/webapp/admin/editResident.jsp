@@ -139,15 +139,6 @@
             width: 70%;
         }
 
-        /* Super Admin Checkbox */
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
         .checkbox-container input {
             width: 16px;
             height: 16px;
@@ -186,6 +177,32 @@
             text-align: center;
             margin-bottom: 15px;
             display: ${not empty error ? "block" : "none"};
+        }
+
+        /* Back Button Container */
+        .back-btn-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* Back Button */
+        .back-btn {
+            background-color: #757575;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 50%; /* Adjust width as needed */
+            text-align: center;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #616161;
+            transform: scale(1.03);
         }
 
     </style>
@@ -228,7 +245,7 @@
         <input type="text" name="username" value="<%= resident.getUsername() %>" placeholder="Username" required>
 
         <!-- Password Field (Optional) -->
-        <input type="password" id="password" name="password" placeholder="New Password (Leave blank to keep current)" onkeyup="validatePassword()">
+        <input type="password" id="password" name="password" placeholder="New Password (Leave blank to keep current)" disabled>
         <p class="error-message" id="passwordError">Password must be at least 5 characters long and contain at least 1 number.</p>
 
         <input type="text" name="name" value="<%= resident.getName() %>" placeholder="Full Name" required>
@@ -260,7 +277,10 @@
         <button type="submit" class="submit-btn">Update Resident</button>
     </form>
 
-    <a href="${pageContext.request.contextPath}/admin/manageResident" class="back-btn">← Back to Manage Resident</a>
+    <div class="back-btn-container">
+        <a href="${pageContext.request.contextPath}/admin/manageResident" class="back-btn">← Back to Manage Resident</a>
+    </div>
+
 </div>
 
 <script>
