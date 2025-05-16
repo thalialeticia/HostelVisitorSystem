@@ -3,6 +3,7 @@ package com.example.hostelvisitorsystem.controller;
 import com.example.hostelvisitorsystem.ejb.UserFacade;
 import com.example.hostelvisitorsystem.model.ManagingStaff;
 import com.example.hostelvisitorsystem.model.Resident;
+import com.example.hostelvisitorsystem.model.SecurityStaff;
 import com.example.hostelvisitorsystem.model.User;
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.time.LocalTime;
 
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
@@ -54,6 +56,25 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("isSuperAdmin", staff.isSuperAdmin());
             } else {
                 session.setAttribute("isSuperAdmin", false);
+            }
+
+            if (user instanceof SecurityStaff security) {
+                LocalTime now = LocalTime.now();
+                String shift = security.getShift().name();
+
+                boolean isAllowed = switch (shift) {
+                    case "MORNING" -> now.isAfter(LocalTime.of(6, 0)) && now.isBefore(LocalTime.of(14, 0));
+                    case "EVENING" -> now.isAfter(LocalTime.of(14, 0)) && now.isBefore(LocalTime.of(22, 0));
+                    case "NIGHT" -> now.isAfter(LocalTime.of(22, 0)) || now.isBefore(LocalTime.of(6, 0));
+                    default -> false;
+                };
+
+                if (!isAllowed) {
+                    request.setAttribute("error", "Login restricted: Your shift is " + shift +
+                            ". Please log in during your assigned hours.");
+                    request.getRequestDispatcher("/login.jsp").forward(request, response);
+                    return;
+                }
             }
 
             switch (user.getRole()) {

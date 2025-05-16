@@ -178,6 +178,11 @@
             cursor: pointer;
         }
 
+        .shift-container {
+            display: none; /* Hidden by default */
+            margin-top: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -244,10 +249,20 @@
         <input type="email" name="email" placeholder="Email" required>
 
         <!-- Role Selection -->
-        <select name="role" id="roleSelect" onchange="toggleSuperAdmin()">
+        <select name="role" id="roleSelect" onchange="toggleFields()">
             <option value="SECURITY_STAFF">Security Staff</option>
             <option value="MANAGING_STAFF">Managing Staff</option>
         </select>
+
+        <!-- Shift Selection (Only for Security Staff) -->
+        <div class="shift-container" id="shiftContainer">
+            <label for="shift">Assign Shift:</label>
+            <select name="shift" id="shift">
+                <option value="MORNING">Morning (6 AM - 2 PM)</option>
+                <option value="EVENING">Evening (2 PM - 10 PM)</option>
+                <option value="NIGHT">Night (10 PM - 6 AM)</option>
+            </select>
+        </div>
 
         <!-- Super Admin Checkbox (Hidden by Default) -->
         <div class="checkbox-container" id="superAdminContainer" style="display: none;">
@@ -312,14 +327,18 @@
         return validatePassword() && validatePhone() && validateIC();
     }
 
-    function toggleSuperAdmin() {
+    function toggleFields() {
         let role = document.getElementById("roleSelect").value;
+        let shiftContainer = document.getElementById("shiftContainer");
         let superAdminContainer = document.getElementById("superAdminContainer");
 
         let isLoggedInSuperAdmin = <%= (session.getAttribute("loggedUser") instanceof ManagingStaff) && ((ManagingStaff) session.getAttribute("loggedUser")).isSuperAdmin() %>;
 
+        shiftContainer.style.display = (role === "SECURITY_STAFF") ? "block" : "none";
         superAdminContainer.style.display = (role === "MANAGING_STAFF" && isLoggedInSuperAdmin) ? "flex" : "none";
     }
+
+    window.onload = toggleFields;
 </script>
 
 </body>

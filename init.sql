@@ -100,7 +100,9 @@ VALUES
     (UUID(), 'resident5', '$2a$12$zkw2fRbMgHpEyUfWv9VmW.NcSQgusY9bSc.T7P6fQn7CxlM5t2LSy', 'Resident Five', 'FEMALE', '0123456780', '1023456789012', 'resident5@example.com', 'RESIDENT'),
     (UUID(), 'resident6', '$2a$12$6pyYWLWD2J7MnSauhvVf4uy35eCq6dMwCD8uwITvKF/jHps4PnRdi', 'Resident Six', 'MALE', '0123456700', '923456789023', 'resident6@example.com', 'RESIDENT'),
     (UUID(), 'resident7', '$2a$12$YysE2vgPyO/D0t/V.kklcuPr/T3f4y0vWxE66cTmZS21U5BQX477u', 'Resident Seven', 'FEMALE', '0123453280', '1023456789010', 'resident7@example.com', 'RESIDENT'),
-    (UUID(), 'resident8', '$2a$12$.EQjeq0ZasIEO.yR/3P0O.d2nXKIIVgIZD3OExLbQkqJbcsWyw4IK', 'Resident Eight', 'FEMALE', '0123253280', '1023456712010', 'resident8@example.com', 'RESIDENT');
+    (UUID(), 'resident8', '$2a$12$.EQjeq0ZasIEO.yR/3P0O.d2nXKIIVgIZD3OExLbQkqJbcsWyw4IK', 'Resident Eight', 'FEMALE', '0123253280', '1023456712010', 'resident8@example.com', 'RESIDENT'),
+    (UUID(), 'resident9', '$2a$12$vJyjnMSQsB3dIg32GabGBudI4QC9SPYCXZ9g4Hhp5nYjSOJL/NqKq', 'Resident Nine', 'FEMALE', '0123453980', '8723456789010', 'resident9@example.com', 'RESIDENT'),
+    (UUID(), 'resident10', '$2a$12$83HRG2MW80yUr6A951HXbOKOCpLlDyW.j0b/jxbGai6fCIgHhkeIu', 'Resident Ten', 'FEMALE', '0123293280', '9923456712010', 'resident10@example.com', 'RESIDENT');
 
 
 INSERT INTO residents (id, status)
@@ -112,7 +114,10 @@ VALUES
     ((SELECT id FROM users WHERE username='resident5'), 'REJECTED'),
     ((SELECT id FROM users WHERE username='resident6'), 'PENDING'),
     ((SELECT id FROM users WHERE username='resident7'), 'PENDING'),
-    ((SELECT id FROM users WHERE username='resident8'), 'APPROVED');
+    ((SELECT id FROM users WHERE username='resident8'), 'APPROVED'),
+    ((SELECT id FROM users WHERE username='resident9'), 'APPROVED'),
+    ((SELECT id FROM users WHERE username='resident10'), 'APPROVED');
+
 
 -- Insert Security Staff (3 Users)
 INSERT INTO users (id, username, password, name, gender, phone, IC, email, role)
@@ -123,9 +128,9 @@ VALUES
 
 INSERT INTO security_staff (id, shift)
 VALUES
-    ((SELECT id FROM users WHERE username='security1'), 'NIGHT'),
-    ((SELECT id FROM users WHERE username='security2'), 'MORNING'),
-    ((SELECT id FROM users WHERE username='security3'), 'MORNING');
+    ((SELECT id FROM users WHERE username='security1'), 'MORNING'),
+    ((SELECT id FROM users WHERE username='security2'), 'EVENING'),
+    ((SELECT id FROM users WHERE username='security3'), 'NIGHT');
 
 -- Insert sample visit requests (Fixed logic for REACHED status)
 INSERT INTO visit_requests (

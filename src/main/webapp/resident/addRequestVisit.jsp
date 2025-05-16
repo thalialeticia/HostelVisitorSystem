@@ -122,17 +122,25 @@
             transform: scale(1.03);
         }
 
+        /* Back Button Container */
+        .back-btn-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* Back Button */
         .back-btn {
             background-color: #757575;
             color: white;
             padding: 12px;
+            border: none;
             border-radius: 6px;
+            cursor: pointer;
             font-size: 16px;
-            width: 100%;
-            margin-top: 10px;
-            display: inline-block;
+            width: 50%; /* Adjust width as needed */
             text-align: center;
-            text-decoration: none;
+            transition: background 0.3s ease, transform 0.2s ease;
         }
 
         .back-btn:hover {
@@ -224,7 +232,11 @@
         <button type="submit" class="submit-btn">Submit Request</button>
     </form>
 
-    <a href="${pageContext.request.contextPath}/resident/dashboardResident" class="back-btn">← Back to Dashboard</a>
+    <!-- Back Button -->
+    <div class="back-btn-container">
+        <a href="${pageContext.request.contextPath}/resident/dashboardResident" class="back-btn">← Back to Dashboardf</a>
+    </div>
+
 </div>
 
 <script>
