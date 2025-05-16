@@ -263,7 +263,7 @@
                 <option value="NIGHT">Night (10 PM - 6 AM)</option>
             </select>
         </div>
-
+      
         <!-- Super Admin Checkbox (Hidden by Default) -->
         <div class="checkbox-container" id="superAdminContainer" style="display: none;">
             <input type="checkbox" id="superAdmin" name="superAdmin">
@@ -332,10 +332,10 @@
         let shiftContainer = document.getElementById("shiftContainer");
         let superAdminContainer = document.getElementById("superAdminContainer");
 
-        let isLoggedInSuperAdmin = <%= (session.getAttribute("loggedUser") instanceof ManagingStaff) && ((ManagingStaff) session.getAttribute("loggedUser")).isSuperAdmin() %>;
+        let isLoggedInSuperAdmin = <%= ((session.getAttribute("loggedUser") instanceof ManagingStaff) && ((ManagingStaff) session.getAttribute("loggedUser")).isSuperAdmin()) ? "true" : "false" %>;
 
         shiftContainer.style.display = (role === "SECURITY_STAFF") ? "block" : "none";
-        superAdminContainer.style.display = (role === "MANAGING_STAFF" && isLoggedInSuperAdmin) ? "flex" : "none";
+        superAdminContainer.style.display = (role === "MANAGING_STAFF" && isLoggedInSuperAdmin === "true") ? "flex" : "none";
     }
 
     window.onload = toggleFields;

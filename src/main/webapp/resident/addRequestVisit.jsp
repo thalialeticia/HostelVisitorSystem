@@ -236,7 +236,6 @@
     <div class="back-btn-container">
         <a href="${pageContext.request.contextPath}/resident/dashboardResident" class="back-btn">← Back to Dashboardf</a>
     </div>
-
 </div>
 
 <script>

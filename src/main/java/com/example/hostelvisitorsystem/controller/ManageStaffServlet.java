@@ -89,7 +89,6 @@ public class ManageStaffServlet extends HttpServlet {
         String email = request.getParameter("email");
         String role = request.getParameter("role");
         boolean newSuperAdmin = "on".equals(request.getParameter("superAdmin"));
-
         String shiftParam = request.getParameter("shift");
 
         if (!isSuperAdmin && role.equals("MANAGING_STAFF")) {

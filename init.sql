@@ -118,7 +118,6 @@ VALUES
     ((SELECT id FROM users WHERE username='resident9'), 'APPROVED'),
     ((SELECT id FROM users WHERE username='resident10'), 'APPROVED');
 
-
 -- Insert Security Staff (3 Users)
 INSERT INTO users (id, username, password, name, gender, phone, IC, email, role)
 VALUES

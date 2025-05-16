@@ -44,7 +44,6 @@
     // Check if the user is a Managing Staff & Super Admin
     boolean isCurrentUserSuperAdmin = (currentUser instanceof ManagingStaff) && ((ManagingStaff) currentUser).isSuperAdmin();
     boolean isEditingSuperAdmin = (staff instanceof ManagingStaff) && ((ManagingStaff) staff).isSuperAdmin();
-
     // Check if the staff being edited is a Security Staff & get their shift
     boolean isSecurityStaff = staff instanceof SecurityStaff;
     String currentShift = isSecurityStaff ? ((SecurityStaff) staff).getShift().name() : "";
@@ -383,7 +382,6 @@
 
     // Ensure correct field visibility on page load
     window.onload = toggleFields;
-
 </script>
 
 </body>
