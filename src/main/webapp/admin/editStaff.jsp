@@ -8,6 +8,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.example.hostelvisitorsystem.model.User" %>
 <%@ page import="com.example.hostelvisitorsystem.model.ManagingStaff" %>
+<%@ page import="com.example.hostelvisitorsystem.model.SecurityStaff" %>
 
 <%
     String id = request.getParameter("id");
@@ -43,6 +44,9 @@
     // Check if the user is a Managing Staff & Super Admin
     boolean isCurrentUserSuperAdmin = (currentUser instanceof ManagingStaff) && ((ManagingStaff) currentUser).isSuperAdmin();
     boolean isEditingSuperAdmin = (staff instanceof ManagingStaff) && ((ManagingStaff) staff).isSuperAdmin();
+    // Check if the staff being edited is a Security Staff & get their shift
+    boolean isSecurityStaff = staff instanceof SecurityStaff;
+    String currentShift = isSecurityStaff ? ((SecurityStaff) staff).getShift().name() : "";
 %>
 
 <html>
@@ -135,8 +139,32 @@
         }
 
         .submit-btn:hover { background-color: #1565c0; transform: scale(1.03); }
-        .back-btn { background-color: #757575; }
-        .back-btn:hover { background-color: #616161; transform: scale(1.03); }
+
+        /* Back Button Container */
+        .back-btn-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* Back Button */
+        .back-btn {
+            background-color: #757575;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 50%; /* Adjust width as needed */
+            text-align: center;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #616161;
+            transform: scale(1.03);
+        }
 
         /* Phone Number Layout */
         .phone-container {
@@ -178,6 +206,11 @@
             background-color: #e0e0e0;
             cursor: not-allowed;
             color: #757575; /* Make disabled text look inactive */
+        }
+
+        .shift-container {
+            display: none; /* Hidden by default */
+            margin-top: 10px;
         }
 
     </style>
@@ -249,11 +282,21 @@
 
         <input type="email" name="email" value="<%= staff.getEmail() %>" placeholder="Email" required>
 
-        <!-- Role Selection (Only Super Admin Can Edit) -->
-        <select name="role" id="roleSelect" <%= isCurrentUserSuperAdmin ? "" : "disabled class='disabled-field'" %>>
-            <option value="SECURITY_STAFF" <%= staff.getRole().name().equals("SECURITY_STAFF") ? "selected" : "" %>>Security Staff</option>
-            <option value="MANAGING_STAFF" <%= staff.getRole().name().equals("MANAGING_STAFF") ? "selected" : "" %>>Managing Staff</option>
+        <!-- Role Selection -->
+        <select name="role" id="roleSelect" onchange="toggleFields()">
+            <option value="SECURITY_STAFF" <%= isSecurityStaff ? "selected" : "" %>>Security Staff</option>
+            <option value="MANAGING_STAFF" <%= staff instanceof ManagingStaff ? "selected" : "" %>>Managing Staff</option>
         </select>
+
+        <!-- Shift Selection (Only for Security Staff) -->
+        <div class="shift-container" id="shiftContainer">
+            <label for="shift">Assign Shift:</label>
+            <select name="shift" id="shift">
+                <option value="MORNING" <%= "MORNING".equals(currentShift) ? "selected" : "" %>>Morning (6 AM - 2 PM)</option>
+                <option value="EVENING" <%= "EVENING".equals(currentShift) ? "selected" : "" %>>Evening (2 PM - 10 PM)</option>
+                <option value="NIGHT" <%= "NIGHT".equals(currentShift) ? "selected" : "" %>>Night (10 PM - 6 AM)</option>
+            </select>
+        </div>
 
         <!-- Super Admin Checkbox (Only Super Admin Can Edit) -->
         <div class="checkbox-container" id="superAdminContainer">
@@ -266,7 +309,11 @@
         <button type="submit" class="submit-btn">Update Staff</button>
     </form>
 
-    <a href="${pageContext.request.contextPath}/admin/manageStaff" class="back-btn">← Back to Manage Staff</a>
+    <!-- Back Button -->
+    <div class="back-btn-container">
+        <a href="${pageContext.request.contextPath}/admin/manageStaff" class="back-btn">← Back to Manage Staff</a>
+    </div>
+
 </div>
 
 <script>
@@ -323,6 +370,18 @@
         return validatePhone() && validateIC();
     }
 
+    function toggleFields() {
+        let role = document.getElementById("roleSelect").value;
+        let shiftContainer = document.getElementById("shiftContainer");
+        let superAdminContainer = document.getElementById("superAdminContainer");
+
+        let isSecurityStaff = role === "SECURITY_STAFF";
+        shiftContainer.style.display = isSecurityStaff ? "block" : "none";
+        superAdminContainer.style.display = (role === "MANAGING_STAFF" && <%= isCurrentUserSuperAdmin %>) ? "flex" : "none";
+    }
+
+    // Ensure correct field visibility on page load
+    window.onload = toggleFields;
 </script>
 
 </body>

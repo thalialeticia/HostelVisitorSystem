@@ -8,10 +8,17 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.example.hostelvisitorsystem.model.User" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
+<%@ page import="com.example.hostelvisitorsystem.model.ManagingStaff" %>
 
 <%
     HttpSession sessionObj = request.getSession(false);
     User loggedUser = (sessionObj != null) ? (User) sessionObj.getAttribute("loggedUser") : null;
+    boolean isSuperAdmin = false;
+
+    if (loggedUser instanceof ManagingStaff) {
+        ManagingStaff staff = (ManagingStaff) loggedUser;
+        isSuperAdmin = staff.isSuperAdmin();
+    }
 
     if (loggedUser == null || !loggedUser.getRole().toString().equals("MANAGING_STAFF")) {
         response.sendRedirect("../login.jsp");
@@ -28,6 +35,7 @@
     int residentCount = (totalResidents != null) ? totalResidents.intValue() : 0;
     int visitorCount = (totalVisitors != null) ? totalVisitors.intValue() : 0;
 %>
+
 <html>
 <head>
     <title>Admin Dashboard</title>
@@ -155,7 +163,9 @@
         <i class="fa-solid fa-user-pen"></i>
     </a>
     <h2>Welcome, <%= loggedUser.getUsername() %>!</h2>
-    <p>Role: <strong>Admin (Managing Staff)</strong></p>
+    <p>Role: <strong>
+        <%= isSuperAdmin ? "Super Admin (Managing Staff)" : "Admin (Managing Staff)" %>
+    </strong></p>
 
     <!-- Dashboard Analytics -->
     <div class="dashboard-stats">

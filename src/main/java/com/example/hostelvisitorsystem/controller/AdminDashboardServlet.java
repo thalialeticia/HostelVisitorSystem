@@ -39,6 +39,16 @@ public class AdminDashboardServlet extends HttpServlet {
             HttpSession session = request.getSession(false);
             User loggedUser = (session != null) ? (User) session.getAttribute("loggedUser") : null;
 
+            if (!loggedUser.getRole().toString().equals("MANAGING_STAFF")) {}
+            switch (loggedUser.getRole()) {
+                case RESIDENT:
+                    response.sendRedirect(request.getContextPath() + "/resident/dashboardResident");
+                    break;
+                case SECURITY_STAFF:
+                    response.sendRedirect(request.getContextPath() + "/security/dashboardSecurity");
+                    break;
+            }
+
             if (loggedUser == null || !loggedUser.getRole().toString().equals("MANAGING_STAFF")) {
                 response.sendRedirect(request.getContextPath() + "/login.jsp");
                 return;

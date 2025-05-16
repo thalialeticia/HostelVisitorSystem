@@ -107,12 +107,30 @@
 
         .button:hover { background-color: #1565c0; }
 
+        /* Back Button Container */
+        .back-btn-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* Back Button */
         .back-btn {
             background-color: #757575;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 50%; /* Adjust width as needed */
+            text-align: center;
+            transition: background 0.3s ease, transform 0.2s ease;
         }
 
         .back-btn:hover {
             background-color: #616161;
+            transform: scale(1.03);
         }
 
         .phone-container {
@@ -172,8 +190,9 @@
 
         <button type="submit" class="button">Update Profile</button>
     </form>
-
-    <a href="${pageContext.request.contextPath}/admin/dashboard" class="button back-btn">Back to Dashboard</a>
+    <div class="back-btn-container">
+        <a href="${pageContext.request.contextPath}/admin/dashboard" class="back-btn">Back to Dashboard</a>
+    </div>
 </div>
 
 <script>

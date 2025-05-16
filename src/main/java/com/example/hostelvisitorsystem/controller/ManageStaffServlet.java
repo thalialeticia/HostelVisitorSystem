@@ -89,6 +89,7 @@ public class ManageStaffServlet extends HttpServlet {
         String email = request.getParameter("email");
         String role = request.getParameter("role");
         boolean newSuperAdmin = "on".equals(request.getParameter("superAdmin"));
+        String shiftParam = request.getParameter("shift");
 
         if (!isSuperAdmin && role.equals("MANAGING_STAFF")) {
             request.setAttribute("error", "Only a super admin can create managing staff.");
@@ -126,7 +127,22 @@ public class ManageStaffServlet extends HttpServlet {
             staff.setSuperAdmin(newSuperAdmin);
             newUser = staff;
         } else if (role.equals("SECURITY_STAFF")) {
-            newUser = new SecurityStaff();
+            if (shiftParam == null || shiftParam.isEmpty()) {
+                request.setAttribute("error", "Please select a shift for Security Staff.");
+                request.getRequestDispatcher("/admin/addStaff.jsp").forward(request, response);
+                return;
+            }
+
+            SecurityStaff securityStaff = new SecurityStaff();
+            try {
+                securityStaff.setShift(SecurityStaff.Shift.valueOf(shiftParam)); // Convert String to Enum
+            } catch (IllegalArgumentException e) {
+                request.setAttribute("error", "Invalid shift selection.");
+                request.getRequestDispatcher("/admin/addStaff.jsp").forward(request, response);
+                return;
+            }
+
+            newUser = securityStaff;
         } else {
             request.getSession().setAttribute("error", "Invalid role selection.");
             request.getRequestDispatcher("/admin/addStaff.jsp").forward(request, response);
@@ -169,6 +185,7 @@ public class ManageStaffServlet extends HttpServlet {
         String IC = request.getParameter("IC");
         String email = request.getParameter("email");
         String role = request.getParameter("role");
+        String shiftParam = request.getParameter("shift");
 
         boolean isSuperAdminChecked = "on".equals(request.getParameter("superAdmin"));
 
@@ -224,6 +241,17 @@ public class ManageStaffServlet extends HttpServlet {
             if (isCurrentUserSuperAdmin) {
                 ((ManagingStaff) staff).setSuperAdmin(isSuperAdminChecked);
                 staff.setRole(User.Role.valueOf(role));
+            }
+        } else if (staff instanceof SecurityStaff) {
+            if (shiftParam != null && !shiftParam.isEmpty()) {
+                try {
+                    ((SecurityStaff) staff).setShift(SecurityStaff.Shift.valueOf(shiftParam)); // Convert String to Enum
+                } catch (IllegalArgumentException e) {
+                    request.setAttribute("error", "Invalid shift selection.");
+                    request.setAttribute("staff", staff);
+                    request.getRequestDispatcher("/admin/editStaff.jsp").forward(request, response);
+                    return;
+                }
             }
         }
 

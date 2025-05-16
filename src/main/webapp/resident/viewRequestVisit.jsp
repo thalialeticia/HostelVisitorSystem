@@ -197,6 +197,7 @@
         <div class="info-item"><i class="fa-solid fa-calendar"></i> <span>Visit Date: </span>&nbsp; <%= visitRequest.getVisitDate().format(dateFormatter) %></div>
         <div class="info-item"><i class="fa-solid fa-clock"></i> <span>Visit Time: </span>&nbsp; <%= visitRequest.getVisitTime().format(timeFormatter) %></div>
         <div class="info-item"><i class="fa-solid fa-clipboard-list"></i> <span>Purpose: </span>&nbsp; <%= visitRequest.getPurpose() %></div>
+        <div class="info-item"><i class="fa-solid fa-code"></i> <span>Visit Code: </span>&nbsp; <%= visitRequest.getVerificationCode() %></div>
 
         <!-- Check-in & Check-out Time Section -->
         <div class="check-time-container" style="margin-bottom: 10px">
